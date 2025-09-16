@@ -1,138 +1,147 @@
-#include <iostream>
 #include <fstream>
-#include <vector>
+#include <iostream>
+#include <sstream>
 #include <string>
-#include <memory>
-#include <queue>
+#include <vector>
+// #include <memory>
+// #include <queue>
 #include "heuristics.h"
+#include <cstring>
 
 State split(std::string s) {
-    size_t pos_start = 0, pos_end;
-    std::string token;
-    State res;
-    while ((pos_end = s.find(" ", pos_start)) != std::string::npos) {
-        token = s.substr(pos_start, pos_end - pos_start);
-        pos_start = pos_end + 1;
-        res.push_back((uint32_t)std::stoi(token));
-    }
-    res.push_back((uint32_t)std::stoi(s.substr(pos_start)));
-    return res;
+  size_t pos_start = 0, pos_end;
+  std::string token;
+  State res;
+  while ((pos_end = s.find(" ", pos_start)) != std::string::npos) {
+    token = s.substr(pos_start, pos_end - pos_start);
+    pos_start = pos_end + 1;
+    res.push_back((uint32_t)std::stoi(token));
+  }
+  res.push_back((uint32_t)std::stoi(s.substr(pos_start)));
+  return res;
 }
 
-std::vector<State> parse_instances(const std::string& filename) {
-    std::ifstream in(filename);
-    std::vector<State> states;
-    std::string line;
+// Not used currently, uncomment the "astar" part in the run_algorithm function
+// to use again
+void print_graph(const std::string &filename, std::shared_ptr<Node> root) {
+  std::ofstream out(filename);
+  std::queue<std::shared_ptr<Node>> queue;
+  std::shared_ptr<Node> pred = nullptr;
+  std::shared_ptr<Node> curr = nullptr;
+  queue.push(root);
 
-    while (getline(in, line)) {
-        if (line.size() > 1)
-            states.push_back(split(line));
+  while (!queue.empty()) {
+    std::shared_ptr<Node> curr = queue.front();
+    queue.pop();
+    if (pred) {
+      if (pred->g < curr->g)
+        out << "\n";
+      else
+        out << " ";
     }
-    return states;
+    out << state_to_string(curr->state);
+    for (auto child : curr->children) {
+      queue.push(child);
+    }
+    pred = curr;
+  }
 }
 
-void print_graph(const std::string& filename, std::shared_ptr<Node> root) {
-    std::ofstream out(filename);
-    std::queue<std::shared_ptr<Node>> queue;
-    std::shared_ptr<Node> pred = nullptr;
-    std::shared_ptr<Node> curr = nullptr;
-    queue.push(root);
-
-    while(!queue.empty()) {
-        std::shared_ptr<Node> curr = queue.front();
-        queue.pop();
-        if (pred) {
-            if (pred->g < curr->g) out << "\n";
-            else out << " ";
-        }
-        out << state_to_string(curr->state);
-        for (auto child : curr->children) {
-            queue.push(child);
-        }
-        pred = curr;
-    }
+void print_usage() {
+  std::cout << "Usage: ./main <algorithm> <puzzle1> <puzzle2> ...\n";
+  std::cout << "Algorithms: -astar, -bfs, -idastar, -idfs, -gbfs\n";
+  std::cout << "Puzzle format: numbers separated by spaces, puzzles separated "
+               "by commas\n";
+  std::cout << "Examples:\n";
+  std::cout << "  ./main -astar 0 6 1 7 4 2 3 8 5\n";
+  std::cout << "  ./main -bfs 5 0 2 6 4 8 1 7 3, 2 4 7 0 3 6 8 1 5\n";
 }
 
-int main(int argc, char** argv) {
-    State state = {5, 0, 2, 6, 4, 8, 1, 7, 3};
+std::vector<State> parse_command_line_puzzles(int argc, char *argv[]) {
+  std::vector<State> puzzles;
 
-    std::cout << "\nBFS:" << "\n";
-    Solution sol_bfs = bfs_graph(state);
-    std::cout << sol_bfs.n_expanded << "\n";
-    std::cout << sol_bfs.sol_depth << "\n";
-    std::cout << sol_bfs.time << "\n";
-    std::cout << sol_bfs.start_h << "\n";
+  if (argc < 3) {
+    print_usage();
+    exit(1);
+  }
 
-    std::cout << "\nGSFS:" << "\n";
-    Solution sol_gbfs = greedy_best_first(state);
-    std::cout << sol_gbfs.n_expanded << "\n";
-    std::cout << sol_gbfs.sol_depth << "\n";
-    std::cout << sol_gbfs.time << "\n";
+  // Combine all arguments after algorithm into one string
+  std::string puzzle_args;
+  for (int i = 2; i < argc; i++) {
+    puzzle_args += argv[i];
+    puzzle_args += " ";
+  }
 
-    std::cout << "\nID:" << "\n";
-    Solution sol_iter_deep = iter_deep(state);
-    std::cout << sol_iter_deep.n_expanded << "\n";
-    std::cout << sol_iter_deep.sol_depth << "\n";
-    std::cout << sol_iter_deep.time << "\n";
+  // Split by commas to get individual puzzles
+  std::vector<std::string> puzzle_strings;
+  std::stringstream ss(puzzle_args);
+  std::string token;
 
-    std::cout << "\nA*:" << "\n";
-    Solution sol_astar = astar(state);
-    std::cout << sol_astar.n_expanded << "\n";
-    std::cout << sol_astar.sol_depth << "\n";
-    std::cout << sol_astar.avg_h << "\n";
-    std::cout << sol_astar.time << "\n";
+  while (std::getline(ss, token, ',')) {
+    // Remove leading/trailing whitespace
+    size_t start = token.find_first_not_of(" \t\n\r");
+    size_t end = token.find_last_not_of(" \t\n\r");
 
-    std::shared_ptr<Node> root_astar = sol_astar.root;
-    print_graph("graph_astar.txt", root_astar);
+    if (start != std::string::npos && end != std::string::npos) {
+      puzzle_strings.push_back(token.substr(start, end - start + 1));
+    }
+  }
 
-    std::cout << "\nIDA*:" << "\n";
-    Solution sol_idastar = idastar(state);
-    std::cout << sol_idastar.n_expanded << "\n";
-    std::cout << sol_idastar.sol_depth << "\n";
-    std::cout << sol_idastar.avg_h << "\n";
-    std::cout << sol_idastar.time << "\n";
+  // Parse each puzzle string using your existing split function
+  for (const auto &puzzle_str : puzzle_strings) {
+    State puzzle = split(puzzle_str);
 
-    // std::string filename;
-    // if (argc > 1) {
-    //     filename = argv[1];
-    // } else {
-    //     filename = "8puzzle_instances.txt";
-    // }
-    // std::vector<State> states = parse_instances(filename);
-    // std::cout << "Running on " << filename << "\n\n";
+    // Validate puzzle size
+    if (puzzle.size() != 9 && puzzle.size() != 16) {
+      std::cerr
+          << "Error: Puzzle must have 9 (8-puzzle) or 16 (15-puzzle) tiles\n";
+      std::cerr << "Received: " << puzzle.size()
+                << " tiles: " << state_to_string(puzzle) << "\n";
+      exit(1);
+    }
 
-    // for (State state : states) {
-    //     std::cout << "----------------------------" << "\n";
-    //     std::cout << "State (" << state_to_string(state) << "):" << "\n";
-    //     std::cout << "----------------------------" << "\n";
+    puzzles.push_back(puzzle);
+  }
 
-    //     std::cout << "\nBFS:" << "\n";
-    //     Solution sol_bfs = bfs_graph(state);
-    //     std::cout << sol_bfs.n_expanded << "\n";
-    //     std::cout << sol_bfs.sol_depth << "\n";
-    //     std::cout << sol_bfs.time << "\n";
+  return puzzles;
+}
 
-    //     std::cout << "\nID:" << "\n";
-    //     Solution sol_iter_deep = iter_deep(state);
-    //     std::cout << sol_iter_deep.n_expanded << "\n";
-    //     std::cout << sol_iter_deep.sol_depth << "\n";
-    //     std::cout << sol_iter_deep.time << "\n";
+void run_algorithm(const std::string &algorithm, const State &state) {
+  Solution sol;
+  if (algorithm == "-astar") {
+    sol = astar(state);
+//    std::shared_ptr<Node> root_astar = sol.root;
+//    print_graph("graph_astar.txt", root_astar);
 
-    //     std::cout << "\nA*:" << "\n";
-    //     Solution sol_astar = astar(state);
-    //     std::cout << sol_astar.n_expanded << "\n";
-    //     std::cout << sol_astar.sol_depth << "\n";
-    //     std::cout << sol_astar.avg_h << "\n";
-    //     std::cout << sol_astar.time << "\n";
+  } else if (algorithm == "-bfs") {
+    sol = bfs_graph(state);
+  } else if (algorithm == "-idastar") {
+    sol = idastar(state);
+  } else if (algorithm == "-idfs") {
+    sol = iter_deep(state);
+  } else if (algorithm == "-gbfs") {
+    sol = greedy_best_first(state);
+  } else {
+    std::cerr << "Error: Unknown algorithm " << algorithm << "\n";
+    print_usage();
+    exit(1);
+  }
+  std::cout << sol.n_expanded << "," << sol.sol_depth << "," << sol.time << ","
+            << sol.avg_h << "," << sol.start_h << std::endl;
+}
+int main(int argc, char *argv[]) {
+  if (argc < 3) {
+    print_usage();
+    return 1;
+  }
 
-    //     std::cout << "\nIDA*:" << "\n";
-    //     Solution sol_idastar = idastar(state);
-    //     std::cout << sol_idastar.n_expanded << "\n";
-    //     std::cout << sol_idastar.sol_depth << "\n";
-    //     std::cout << sol_idastar.avg_h << "\n";
-    //     std::cout << sol_idastar.time << "\n";
+  std::string algorithm = argv[1];
+  std::vector<State> puzzles = parse_command_line_puzzles(argc, argv);
 
-    //     std::cout << "\n";
-    // }
-    return 0;
+  // Run the specified algorithm on each puzzle
+  for (const auto &puzzle : puzzles) {
+    run_algorithm(algorithm, puzzle);
+  }
+
+  return 0;
 }
