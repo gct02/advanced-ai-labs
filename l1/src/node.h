@@ -26,21 +26,21 @@ bool comp_states(const State& a, const State& b);
 std::string state_to_string(const State& state);
 
 struct Node {
-    State state;
-    bool is_goal;
-    int g; // Cost from start to current node
-    int h; // Heuristic cost estimate to goal
-    int f; // Total estimated cost
-    std::shared_ptr<Node> parent; // Pointer to parent node for path reconstruction
-    std::vector<std::shared_ptr<Node>> children;
-    uint64_t id; // Unique sequence number for LIFO tie-breaking
+  State state;
+  bool is_goal;
+  int g; // Cost from start to current node
+  int h; // Heuristic cost estimate to goal
+  int f; // Total estimated cost
+  std::shared_ptr<Node> parent; // Pointer to parent node for path reconstruction
+  std::vector<std::shared_ptr<Node>> children;
+  uint64_t id; // Unique sequence number for LIFO tie-breaking
 
-    Node(const State& s, int g_cost, std::shared_ptr<Node> par, uint64_t id_num = 0)
-        : state(s), g(g_cost), parent(par), id(id_num) { 
-        h = manhattan_dist(state);
-        is_goal = is_goal_state(state);
-        f = g + h; 
-    }
+  Node(const State& s, int g_cost, std::shared_ptr<Node> par, uint64_t id_num = 0)
+    : state(s), g(g_cost), parent(par), id(id_num) { 
+    h = manhattan_dist(state);
+    is_goal = is_goal_state(state);
+    f = g + h; 
+  }
 };
 
 #endif // NODE_H

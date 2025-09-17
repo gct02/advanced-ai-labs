@@ -4,7 +4,7 @@ CXXFLAGS = -std=c++11 -Wall -O3
 all: main
 
 main: main.o heuristics.o node.o utils.o
-	$(CXX) $(CXXFLAGS) -o main main.o heuristics.o node.o utils.o -lfl
+	$(CXX) $(CXXFLAGS) -o main main.o heuristics.o node.o utils.o
 
 main.o: src/main.cpp heuristics.o
 	$(CXX) $(CXXFLAGS) -c src/main.cpp
