@@ -227,7 +227,6 @@ Solution astar(const State& start_state) {
     auto neighbors = get_neighbors(curr_node->state, parent_state);
 
     for (const auto& nb : neighbors) {
-      int new_g_cost = curr_node->g + 1;
       auto closed_it = closed_set.find(nb);
       if (closed_it != closed_set.end()) {
         continue;
