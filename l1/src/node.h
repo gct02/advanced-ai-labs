@@ -17,7 +17,10 @@ bool is_goal_state(const State& state);
 
 // Generates all possible neighbor states from the given state 
 // by sliding tiles into the empty space (0).
-std::vector<State> get_neighbors(const State& state);
+std::vector<State> get_neighbors(const State& state, const State* parent_state = nullptr);
+
+// Check if state `a` is equal to state `b`.
+bool comp_states(const State& a, const State& b);
 
 // Creates a string representation of the given state. 
 std::string state_to_string(const State& state);

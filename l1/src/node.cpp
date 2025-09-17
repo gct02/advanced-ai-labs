@@ -27,7 +27,7 @@ bool is_goal_state(const State& state) {
 
 // Generates all possible neighbor states from the given state 
 // by sliding tiles into the empty space (0).
-std::vector<State> get_neighbors(const State& state) {
+std::vector<State> get_neighbors(const State& state, const State* parent_state) {
     std::vector<State> neighbors;
     int size = state.size() == 9 ? 3 : 4;
     int zero_index = std::find(state.begin(), state.end(), 0) - state.begin();
@@ -41,10 +41,21 @@ std::vector<State> get_neighbors(const State& state) {
         if (new_row >= 0 && new_row < size && new_col >= 0 && new_col < size) {
             State new_state(state);
             std::swap(new_state[zero_index], new_state[new_row * size + new_col]);
+            if (parent_state != nullptr)
+                if (comp_states(new_state, *parent_state))
+                    continue;
             neighbors.push_back(new_state);
         }
     }
     return neighbors;
+}
+
+bool comp_states(const State& a, const State& b) {
+    size_t n = a.size();
+    if (b.size() != n) return false;
+    for (uint32_t i = 0; i < (uint32_t)n; i++) 
+        if (a[i] != b[i]) return false;
+    return true;
 }
 
 // Creates a string representation of the given state. 

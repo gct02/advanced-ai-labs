@@ -65,7 +65,7 @@ std::vector<State> parse_command_line_puzzles(int argc, char *argv[]) {
     exit(1);
   }
 
-  // Combine all arguments after algorithm into one string
+  // Combine all arguments after <algorithm> into one string
   std::string puzzle_args;
   for (int i = 2; i < argc; i++) {
     puzzle_args += argv[i];
@@ -87,7 +87,7 @@ std::vector<State> parse_command_line_puzzles(int argc, char *argv[]) {
     }
   }
 
-  // Parse each puzzle string using your existing split function
+  // Parse each puzzle string
   for (const auto &puzzle_str : puzzle_strings) {
     State puzzle = split(puzzle_str);
 

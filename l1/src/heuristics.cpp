@@ -26,6 +26,7 @@ using duration = std::chrono::duration<double>;
 #define MAX_DEPTH 1000
 #define MAX_H 100
 
+
 double get_elapsed_time(time_point start_time) {
     time_point end_time = timer::now();
     duration elapsed = end_time - start_time;
@@ -86,48 +87,41 @@ Solution iter_deep(const State& start_state) {
     sol.start_h = start_node->h;
     sol.root = start_node;
 
-    if (start_node->is_goal) {
-        sol.time = get_elapsed_time(start_time);
-        sol.sol_depth = start_node->g;
-        sol.path.push_front(start_state);
-        return sol;
-    }
-    int depth_lim = 1;
+    int depth_lim = 0;
 
-    while (depth_lim < MAX_DEPTH) {
-        std::deque<std::shared_ptr<Node>> frontier;
-        std::unordered_map<State, bool, StateHasher> explored;
-
-        frontier.push_front(start_node);
-        explored[start_node->state] = true;
+    while (true) {
+        std::stack<std::shared_ptr<Node>> frontier;
+        frontier.push(start_node);
 
         while (!frontier.empty()) {
-            std::shared_ptr<Node> curr_node = frontier.front();
-            frontier.pop_front();
-            if (curr_node->g > depth_lim) continue;
+            std::shared_ptr<Node> curr_node = frontier.top();
+            frontier.pop();
+
+						if (curr_node->is_goal) {
+								sol.sol_depth = curr_node->g;
+								sol.time = get_elapsed_time(start_time);
+								std::shared_ptr<Node> temp = curr_node;
+								while (temp != nullptr) {
+										sol.path.push_front(temp->state);
+										temp = temp->parent;
+								}
+								return sol;
+						}
+						if (curr_node->g > depth_lim) continue;
+
             sol.n_expanded++;
 
-            std::vector<std::shared_ptr<Node>> children;
-            for (const auto& nb : get_neighbors(curr_node->state)) {
-                if (explored.find(nb) == explored.end()) {
-                    std::shared_ptr<Node> nb_node(new Node(nb, curr_node->g + 1, curr_node));
-                    if (nb_node->is_goal) {
-                        sol.sol_depth = nb_node->g;
-                        sol.time = get_elapsed_time(start_time);
-                        std::shared_ptr<Node> temp = nb_node;
-                        while (temp != nullptr) {
-                            sol.path.push_front(temp->state);
-                            temp = temp->parent;
-                        }
-                        return sol;
-                    }
-                    children.push_back(nb_node);
-                    explored[nb] = true;
-                }
+						const State* parent_state = curr_node->parent ? &curr_node->parent->state : nullptr;
+						auto neighbors = get_neighbors(curr_node->state, parent_state);
+						std::reverse(neighbors.begin(), neighbors.end());
+
+            for (const auto& nb : neighbors) {
+								std::shared_ptr<Node> nb_node(new Node(nb, curr_node->g + 1, curr_node));
+                frontier.push(nb_node);
             }
-            frontier.insert(frontier.begin(), children.begin(), children.end());
         }
         depth_lim++;
+				if (depth_lim >= MAX_DEPTH) break;
     }
     sol.time = get_elapsed_time(start_time);
     return sol;
@@ -159,12 +153,12 @@ Solution greedy_best_first(const State& start_state) {
     while (!frontier.empty()) {
         std::shared_ptr<Node> curr_node = frontier.top();
         frontier.pop();
+
         sol.n_expanded++;
 
         for (const auto& nb : get_neighbors(curr_node->state)) {
             if (explored.find(nb) == explored.end()) {
                 std::shared_ptr<Node> nb_node(new Node(nb, curr_node->g + 1, curr_node, node_counter++));
-                curr_node->children.push_back(nb_node);
                 sol.avg_h += nb_node->h;
                 if (nb_node->is_goal) {
                     sol.time = get_elapsed_time(start_time);
@@ -205,35 +199,41 @@ Solution astar(const State& start_state) {
         return sol;
     }
     std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, AstarCompare> frontier;
-    std::unordered_map<State, bool, StateHasher> explored;
-
+		std::unordered_map<State, int, StateHasher> explored;
     frontier.push(start_node);
-    explored[start_state] = true;
+		explored[start_state] = 0;
 
     while (!frontier.empty()) {
         std::shared_ptr<Node> curr_node = frontier.top();
         frontier.pop();
+
         sol.n_expanded++;
 
-        for (const auto& nb : get_neighbors(curr_node->state)) {
-            if (explored.find(nb) == explored.end()) {
-                std::shared_ptr<Node> nb_node(new Node(nb, curr_node->g + 1, curr_node, node_counter++));
-                curr_node->children.push_back(nb_node);
-                sol.avg_h += nb_node->h;
-                if (nb_node->is_goal) {
-                    sol.time = get_elapsed_time(start_time);
-                    sol.sol_depth = nb_node->g;
-                    sol.avg_h /= (int)node_counter;
-                    std::shared_ptr<Node> temp = nb_node;
-                    while (temp != nullptr) {
-                        sol.path.push_front(temp->state);
-                        temp = temp->parent;
-                    }
-                    return sol;
-                }
-                frontier.push(nb_node);
-                explored[nb] = true;
-            }
+				const State* parent_state = curr_node->parent ? &curr_node->parent->state : nullptr;
+				auto neighbors = get_neighbors(curr_node->state, parent_state);
+				std::reverse(neighbors.begin(), neighbors.end());
+
+        for (const auto& nb : neighbors) {
+						auto it = explored.find(nb);
+						if (it != explored.end() && it->second <= curr_node->g + 1) {
+								continue;
+						}
+						std::shared_ptr<Node> nb_node(new Node(nb, curr_node->g + 1, curr_node, node_counter++));
+						sol.avg_h += nb_node->h;
+
+						if (nb_node->is_goal) {
+								sol.time = get_elapsed_time(start_time);
+								sol.sol_depth = nb_node->g;
+								sol.avg_h /= (int)node_counter;
+								std::shared_ptr<Node> temp = nb_node;
+								while (temp != nullptr) {
+										sol.path.push_front(temp->state);
+										temp = temp->parent;
+								}
+								return sol;
+						}
+						frontier.push(nb_node);
+						explored[nb] = nb_node->g;
         }
     }
     sol.time = get_elapsed_time(start_time);
@@ -252,44 +252,43 @@ Solution idastar(const State& start_state) {
 
     int threshold = start_node->f;
 
-    while (threshold < MAX_H) {
-        std::priority_queue<std::shared_ptr<Node>, std::deque<std::shared_ptr<Node>>, AstarCompare> frontier;
-        std::unordered_map<State, bool, StateHasher> explored;
+    while (true) {
+        std::stack<std::shared_ptr<Node>> frontier;
         int next_threshold = INT32_MAX;
 
         frontier.push(start_node);
-        explored[start_node->state] = true;
 
         while (!frontier.empty()) {
             std::shared_ptr<Node> curr_node = frontier.top();
             frontier.pop();
-            if (curr_node->f > threshold) continue;
+
+						if (curr_node->is_goal) {
+								sol.sol_depth = curr_node->g;
+								sol.time = get_elapsed_time(start_time);
+								std::shared_ptr<Node> temp = curr_node;
+								while (temp != nullptr) {
+										sol.path.push_front(temp->state);
+										temp = temp->parent;
+								}
+								return sol;
+						}
+						if (curr_node->f > threshold) {
+								next_threshold = std::min(next_threshold, curr_node->f);
+								continue;
+						}
             sol.n_expanded++;
 
-            for (const auto& nb : get_neighbors(curr_node->state)) {
-                if (explored.find(nb) == explored.end()) {
-                    std::shared_ptr<Node> nb_node(new Node(nb, curr_node->g + 1, curr_node, node_counter++));
-                    sol.avg_h += nb_node->h;
-                    if (nb_node->is_goal) {
-                        sol.sol_depth = nb_node->g;
-                        sol.time = get_elapsed_time(start_time);
-                        if (sol.n_expanded > 0) sol.avg_h /= node_counter;
-                        std::shared_ptr<Node> temp = nb_node;
-                        while (temp != nullptr) {
-                            sol.path.push_front(temp->state);
-                            temp = temp->parent;
-                        }
-                        return sol;
-                    }
-                    frontier.push(nb_node);
-                    explored[nb] = true;
-                    if (nb_node->f > threshold && nb_node->f < next_threshold) {
-                        next_threshold = nb_node->f;
-                    }
-                }
+						const State* parent_state = curr_node->parent ? &curr_node->parent->state : nullptr;
+						auto neighbors = get_neighbors(curr_node->state, parent_state);
+						std::reverse(neighbors.begin(), neighbors.end());
+
+            for (const auto& nb : neighbors) {
+								std::shared_ptr<Node> nb_node(new Node(nb, curr_node->g + 1, curr_node, node_counter++));
+                frontier.push(nb_node);
             }
         }
-        threshold = std::min(next_threshold, INT32_MAX);;
+				threshold = next_threshold;
+        if (threshold == INT32_MAX) break;
     }
     sol.time = get_elapsed_time(start_time);
     if (sol.n_expanded > 0) sol.avg_h /= sol.n_expanded;
