@@ -1,67 +1,86 @@
+#include <iostream>
+#include <inttypes.h>
 #include "node.h"
 
 // Heuristic: Manhattan Distance.
-int manhattan_dist(const State& state) {
-  int dist = 0;
-  int size = (state.size() == 9) ? 3 : 4;
-  for (int i = 0; i < (int)state.size(); ++i) {
-    if (state[i] != 0) {
-      int value = state[i];
-      int row = i / size;
-      int col = i % size;
-      int goal_row = value / size;
-      int goal_col = value % size;
-      dist += abs(row - goal_row) + abs(col - goal_col);
+uint8_t manhattan_dist(State state, int size) {
+  uint8_t h = 0;
+  uint8_t n = size == 9 ? 3 : 4;
+  for (uint8_t i = 0; i < (uint8_t)size; i++) {
+    uint8_t val = (uint8_t)(state & 0xfull);
+    state >>= 4;
+    if (val != 0) {
+      h += abs(i / n - val / n) + abs(i % n - val % n);
     }
   }
-  return dist;
+  return h;
 }
 
-// Check if the given state is a goal state.
-bool is_goal_state(const State& state) {
-  for (uint32_t i = 0; i < (uint32_t)state.size(); i++) {
-    if (state[i] != i) return false;
-  }
-  return true;
+int get_zero_index(State state, int size) {
+  int i = 0;
+  while ((state >> (i * 4)) & 0xfull) i++;
+  return i;
 }
 
 // Generates all possible neighbor states from the given state 
 // by sliding tiles into the empty space (0).
-std::vector<State> get_neighbors(const State& state, const State* parent_state) {
-  std::vector<State> neighbors;
-  int size = state.size() == 9 ? 3 : 4;
-  int zero_index = std::find(state.begin(), state.end(), 0) - state.begin();
-  int row = zero_index / size;
-  int col = zero_index % size;
+void get_neighbors(State state, int size, State parent_state, 
+                   std::vector<State>& neighbors_buffer) {
+  int n = size == 9 ? 3 : 4;
+  int zero_index = get_zero_index(state, size);
+  int row = zero_index / n;
+  int col = zero_index % n;
+  uint64_t mask_zero = 0xfull << (zero_index * 4);
 
-  std::vector<std::pair<int, int>> directions = {{-1, 0}, {0, -1}, {0, 1}, {1, 0}};
-  for (const auto& dir : directions) {
-    int new_row = row + dir.first;
-    int new_col = col + dir.second;
-    if (new_row >= 0 && new_row < size && new_col >= 0 && new_col < size) {
-      State new_state(state);
-      std::swap(new_state[zero_index], new_state[new_row * size + new_col]);
-      if (parent_state != nullptr && comp_states(new_state, *parent_state))
-        continue;
-      neighbors.push_back(new_state);
-    }
+  // Up
+  if (row > 0) {
+    uint64_t mask_tile = ~(0xfull << ((zero_index - n) * 4));
+    uint64_t new_tile = (state << (4 * n)) & mask_zero;
+    uint64_t new_state = (state | new_tile) & mask_tile;
+    if (new_state != parent_state)
+      neighbors_buffer.push_back(new_state);
   }
-  return neighbors;
+  // Left
+  if (col > 0) {
+    uint64_t mask_tile = ~(0xfull << ((zero_index - 1) * 4));
+    uint64_t new_tile = (state << 4) & mask_zero;
+    uint64_t new_state = (state | new_tile) & mask_tile;
+    if (new_state != parent_state)
+      neighbors_buffer.push_back(new_state);
+  }
+  // Right
+  if (col < n - 1) {
+    uint64_t mask_tile = ~(0xfull << ((zero_index + 1) * 4));
+    uint64_t new_tile = (state >> 4) & mask_zero;
+    uint64_t new_state = (state | new_tile) & mask_tile;
+    if (new_state != parent_state)
+      neighbors_buffer.push_back(new_state);
+  }
+  // Down
+  if (row < n - 1) {
+    uint64_t mask_tile = ~(0xfull << ((zero_index + n) * 4));
+    uint64_t new_tile = (state >> (4 * n)) & mask_zero;
+    uint64_t new_state = (state | new_tile) & mask_tile;
+    if (new_state != parent_state)
+      neighbors_buffer.push_back(new_state);
+  }
 }
 
-bool comp_states(const State& a, const State& b) {
-  size_t n = a.size();
-  if (b.size() != n) return false;
-  for (uint32_t i = 0; i < (uint32_t)n; i++) 
-    if (a[i] != b[i]) return false;
-  return true;
+State make_compact_state(const std::vector<uint8_t>& state_vec) {
+  State state = 0x0llu;
+  for (int i = 0; i < (int)state_vec.size(); i++) {
+    state |= ((uint64_t)state_vec[i]) << (i * 4);
+  }
+  printf("state = 0x%" PRIx64 "\n", state);
+  return state;
 }
 
 // Creates a string representation of the given state. 
-std::string state_to_string(const State& state) {
-  std::string s;
-  for (int num : state) {
-    s += std::to_string(num);
-  }
-  return s;
+std::string state_to_string(State state) {
+  // std::string s;
+  // for (int num : state) {
+  //   s += std::to_string(num);
+  // }
+  // return s;
+  return "";
 }

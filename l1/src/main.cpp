@@ -7,45 +7,56 @@
 // #include <queue>
 #include "heuristics.h"
 #include <cstring>
+#include <chrono>
 
-State split(std::string s) {
+using timer = std::chrono::high_resolution_clock;
+using time_point = std::chrono::high_resolution_clock::time_point;
+using duration = std::chrono::duration<double>;
+
+double get_elapsed_time(time_point start_time) {
+  time_point end_time = timer::now();
+  duration elapsed = end_time - start_time;
+  return elapsed.count();
+}
+
+std::vector<uint8_t> split(std::string s) {
   size_t pos_start = 0, pos_end;
   std::string token;
-  State res;
+  std::vector<uint8_t> res;
   while ((pos_end = s.find(" ", pos_start)) != std::string::npos) {
     token = s.substr(pos_start, pos_end - pos_start);
     pos_start = pos_end + 1;
-    res.push_back((uint32_t)std::stoi(token));
+    res.push_back((uint8_t)std::stoi(token));
   }
-  res.push_back((uint32_t)std::stoi(s.substr(pos_start)));
+  res.push_back((uint8_t)std::stoi(s.substr(pos_start)));
   return res;
 }
 
 // Not used currently, uncomment the "astar" part in the run_algorithm function
 // to use again
-void print_graph(const std::string &filename, std::shared_ptr<Node> root) {
-  std::ofstream out(filename);
-  std::queue<std::shared_ptr<Node>> queue;
-  std::shared_ptr<Node> pred = nullptr;
-  std::shared_ptr<Node> curr = nullptr;
-  queue.push(root);
+// void print_graph(const std::string &filename, std::shared_ptr<Node> root) {
+//   std::ofstream out(filename);
+//   std::queue<std::shared_ptr<Node>> queue;
+//   std::shared_ptr<Node> pred = nullptr;
+//   std::shared_ptr<Node> curr = nullptr;
+//   queue.push(root);
 
-  while (!queue.empty()) {
-    std::shared_ptr<Node> curr = queue.front();
-    queue.pop();
-    if (pred) {
-      if (pred->g < curr->g)
-        out << "\n";
-      else
-        out << " ";
-    }
-    out << state_to_string(curr->state);
-    for (auto child : curr->children) {
-      queue.push(child);
-    }
-    pred = curr;
-  }
-}
+//   while (!queue.empty()) {
+//     std::shared_ptr<Node> curr = queue.front();
+//     queue.pop();
+//     if (pred) {
+//       if (pred->g < curr->g)
+//         out << "\n";
+//       else
+//         out << " ";
+//     }
+//     out << state_to_string(curr->state);
+//     for (auto child : curr->children) {
+//       queue.push(child);
+//     }
+//     pred = curr;
+//   }
+// }
 
 void print_usage() {
   std::cout << "Usage: ./main <algorithm> <puzzle1> <puzzle2> ...\n";
@@ -57,8 +68,8 @@ void print_usage() {
   std::cout << "  ./main -bfs 5 0 2 6 4 8 1 7 3, 2 4 7 0 3 6 8 1 5\n";
 }
 
-std::vector<State> parse_command_line_puzzles(int argc, char *argv[]) {
-  std::vector<State> puzzles;
+std::vector<std::vector<uint8_t>> parse_command_line_puzzles(int argc, char *argv[]) {
+  std::vector<std::vector<uint8_t>> puzzles;
 
   if (argc < 3) {
     print_usage();
@@ -89,14 +100,13 @@ std::vector<State> parse_command_line_puzzles(int argc, char *argv[]) {
 
   // Parse each puzzle string
   for (const auto &puzzle_str : puzzle_strings) {
-    State puzzle = split(puzzle_str);
+    std::vector<uint8_t> puzzle = split(puzzle_str);
 
     // Validate puzzle size
     if (puzzle.size() != 9 && puzzle.size() != 16) {
-      std::cerr
-          << "Error: Puzzle must have 9 (8-puzzle) or 16 (15-puzzle) tiles\n";
-      std::cerr << "Received: " << puzzle.size()
-                << " tiles: " << state_to_string(puzzle) << "\n";
+      std::cerr << "Error: Puzzle must have 9 (8-puzzle) or 16 (15-puzzle) tiles\n";
+      std::cerr << "Received: " << puzzle.size() << "\n";
+                // << " tiles: " << state_to_string(puzzle) << "\n";
       exit(1);
     }
 
@@ -106,26 +116,29 @@ std::vector<State> parse_command_line_puzzles(int argc, char *argv[]) {
   return puzzles;
 }
 
-void run_algorithm(const std::string &algorithm, const State &state) {
+void run_algorithm(const std::string &algorithm, const std::vector<uint8_t> &state) {
   Solution sol;
+  State compact_state = make_compact_state(state);
+  time_point start_time = timer::now();
   if (algorithm == "-astar") {
-    sol = astar(state);
+    sol = astar(compact_state, state.size());
 //    std::shared_ptr<Node> root_astar = sol.root;
 //    print_graph("graph_astar.txt", root_astar);
 
-  } else if (algorithm == "-bfs") {
-    sol = bfs_graph(state);
+  // } else if (algorithm == "-bfs") {
+  //   sol = bfs_graph(state);
   } else if (algorithm == "-idastar") {
-    sol = idastar(state);
-  } else if (algorithm == "-idfs") {
-    sol = iter_deep(state);
-  } else if (algorithm == "-gbfs") {
-    sol = greedy_best_first(state);
+    sol = idastar(compact_state, state.size());
+  // } else if (algorithm == "-idfs") {
+  //   sol = iter_deep(state);
+  // } else if (algorithm == "-gbfs") {
+  //   sol = greedy_best_first(state);
   } else {
     std::cerr << "Error: Unknown algorithm " << algorithm << "\n";
     print_usage();
     exit(1);
   }
+  sol.time = get_elapsed_time(start_time);
   std::cout << sol.n_expanded << "," << sol.sol_depth << "," << sol.time << ","
             << sol.avg_h << "," << sol.start_h << std::endl;
 }
@@ -136,7 +149,7 @@ int main(int argc, char *argv[]) {
   }
 
   std::string algorithm = argv[1];
-  std::vector<State> puzzles = parse_command_line_puzzles(argc, argv);
+  std::vector<std::vector<uint8_t>> puzzles = parse_command_line_puzzles(argc, argv);
 
   // Run the specified algorithm on each puzzle
   for (const auto &puzzle : puzzles) {

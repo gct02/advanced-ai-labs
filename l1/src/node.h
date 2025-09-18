@@ -7,40 +7,33 @@
 #include <string>
 #include <memory>
 
-using State = std::vector<uint32_t>;
+using State = uint64_t;
 
 // Heuristic: Manhattan Distance.
-int manhattan_dist(const State& state);
-
-// Check if the given state is a goal state.
-bool is_goal_state(const State& state);
+uint8_t manhattan_dist(State state, int size);
 
 // Generates all possible neighbor states from the given state 
 // by sliding tiles into the empty space (0).
-std::vector<State> get_neighbors(const State& state, const State* parent_state = nullptr);
+void get_neighbors(State state, int size, State parent_state, 
+                   std::vector<State>& neighbors_buffer);
 
-// Check if state `a` is equal to state `b`.
-bool comp_states(const State& a, const State& b);
+State make_compact_state(const std::vector<uint8_t>& state_vec);
 
 // Creates a string representation of the given state. 
-std::string state_to_string(const State& state);
+std::string state_to_string(State state);
 
-struct Node {
+struct Node 
+{
   State state;
-  bool is_goal;
-  int g; // Cost from start to current node
-  int h; // Heuristic cost estimate to goal
-  int f; // Total estimated cost
-  std::shared_ptr<Node> parent; // Pointer to parent node for path reconstruction
-  std::vector<std::shared_ptr<Node>> children;
-  uint64_t id; // Unique sequence number for LIFO tie-breaking
+  Node* parent; // Pointer to parent node for path reconstruction
+  uint16_t f; // Total estimated cost
+  uint16_t g; // Cost from start to current node
+  uint32_t id; // Unique sequence number for LIFO tie-breaking
+  uint8_t h; // Heuristic cost estimate to goal
 
-  Node(const State& s, int g_cost, std::shared_ptr<Node> par, uint64_t id_num = 0)
-    : state(s), g(g_cost), parent(par), id(id_num) { 
-    h = manhattan_dist(state);
-    is_goal = is_goal_state(state);
-    f = g + h; 
-  }
+  Node(State s, int g_cost, Node* par, int size, uint32_t id_num = 0)
+    : state(s), g(g_cost), parent(par), id(id_num), h(manhattan_dist(state, size))
+  { f = g + h; }
 };
 
 #endif // NODE_H
