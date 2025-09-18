@@ -18,9 +18,9 @@ struct Solution {
   double time = 0.0;
 };
 
-Solution bfs_graph(const State& start_state);
-Solution iter_deep(const State& start_state);
-Solution greedy_best_first(const State& start_state);
+Solution bfs_graph(State start_state, int size);
+Solution iter_deep(State start_state, int size);
+Solution greedy_best_first(State start_state, int size);
 Solution astar(State start_state, int size);
 Solution idastar(State start_state, int size);
 

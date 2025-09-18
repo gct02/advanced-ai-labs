@@ -25,159 +25,199 @@
 class AstarPQueue : public std::priority_queue<Node*, std::vector<Node*>, AstarCompare>
 {
 public:
-  AstarPQueue(size_t reserve_size)
+  AstarPQueue(size_t reserve_size = 5000)
   {
     this->c.reserve(reserve_size);
   }
 };
 
-// Solution bfs_graph(const State& start_state) {
-//   Solution sol;
-//   time_point start_time = timer::now();
+class GreedyPQueue : public std::priority_queue<Node*, std::vector<Node*>, GreedyCompare>
+{
+public:
+  GreedyPQueue(size_t reserve_size = 5000)
+  {
+    this->c.reserve(reserve_size);
+  }
+};
 
-//   std::shared_ptr<Node> start_node(new Node(start_state, 0, nullptr));
-//   sol.start_h = start_node->h;
+Solution bfs_graph(State start_state, int size) {
+  Solution sol;
 
-//   if (start_node->h == 0) {
-//     sol.time = get_elapsed_time(start_time);
-//     sol.sol_depth = start_node->g;
-//     sol.path.push_front(start_state);
-//     return sol;
-//   }
-//   std::queue<std::shared_ptr<Node>> frontier;
-//   std::unordered_map<State, bool, StateHasher> explored;
+  std::vector<Node> node_storage;
+  node_storage.reserve(500000000);
 
-//   frontier.push(start_node);
-//   explored[start_state] = true;
+  uint64_t node_counter = 0;
+  node_storage.emplace_back(start_state, 0, nullptr, size, node_counter++);
+  Node* start_node = &node_storage.back();
 
-//   while (!frontier.empty()) {
-//     std::shared_ptr<Node> curr_node = frontier.front();
-//     frontier.pop();
-//     sol.n_expanded++;
+  sol.start_h = (int)start_node->h;
+  sol.avg_h += (double)start_node->h;
+  sol.root = start_node;
 
-//     for (const auto& nb : get_neighbors(curr_node->state)) {
-//       if (explored.find(nb) == explored.end()) {
-//         std::shared_ptr<Node> nb_node(new Node(nb, curr_node->g + 1, curr_node));
-//         if (nb_node->h == 0) {
-//           sol.time = get_elapsed_time(start_time);
-//           sol.sol_depth = nb_node->g;
-//           std::shared_ptr<Node> temp = nb_node;
-//           while (temp != nullptr) {
-//             sol.path.push_front(temp->state);
-//             temp = temp->parent;
-//           }
-//           return sol;
-//         }
-//         frontier.push(nb_node);
-//         explored[nb] = true;
-//       }
-//     }
-//   }
-//   sol.time = get_elapsed_time(start_time);
-//   return sol;
-// }
+  std::vector<State> neighbors_buffer;
+  neighbors_buffer.reserve(4);
 
-// Solution iter_deep(const State& start_state) {
-//   Solution sol;
-//   time_point start_time = timer::now();
+  if (start_node->h == 0) {
+    sol.sol_depth = start_node->g;
+    sol.path.push_back(start_state);
+    return sol;
+  }
+  std::queue<Node*> frontier;
+  std::unordered_set<State> closed_set;
 
-//   std::shared_ptr<Node> start_node(new Node(start_state, 0, nullptr));
-//   sol.start_h = start_node->h;
-//   sol.root = start_node;
+  frontier.push(start_node);
+  closed_set.insert(start_state);
 
-//   int depth_lim = 0;
+  while (!frontier.empty()) {
+    Node* curr_node = frontier.front();
+    frontier.pop();
+    sol.n_expanded++;
 
-//   while (true) {
-//     std::stack<std::shared_ptr<Node>> frontier;
-//     frontier.push(start_node);
+    State parent_state = curr_node->parent ? curr_node->parent->state : 0x0llu;
+    neighbors_buffer.clear();
+    get_neighbors(curr_node->state, size, parent_state, neighbors_buffer);
 
-//     while (!frontier.empty()) {
-//       std::shared_ptr<Node> curr_node = frontier.top();
-//       frontier.pop();
+    for (const auto& nb : neighbors_buffer) {
+      if (closed_set.find(nb) == closed_set.end()) {
+        node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, node_counter++);
+        Node* nb_node = &node_storage.back();
+        if (nb_node->h == 0) {
+          sol.sol_depth = nb_node->g;
+          Node* temp = nb_node;
+          while (temp != nullptr) {
+            sol.path.push_back(temp->state);
+            temp = temp->parent;
+          }
+          std::reverse(sol.path.begin(), sol.path.end());
+          return sol;
+        }
+        frontier.push(nb_node);
+        closed_set.insert(nb);
+      }
+    }
+  }
+  return sol;
+}
 
-//       if (curr_node->h == 0) {
-//         sol.sol_depth = curr_node->g;
-//         sol.time = get_elapsed_time(start_time);
-//         std::shared_ptr<Node> temp = curr_node;
-//         while (temp != nullptr) {
-//           sol.path.push_front(temp->state);
-//           temp = temp->parent;
-//         }
-//         return sol;
-//       }
-//       if (curr_node->g > depth_lim) continue;
+Solution iter_deep(State start_state, int size) {
+  Solution sol;
 
-//       sol.n_expanded++;
+  std::vector<Node> node_storage;
+  node_storage.reserve(500000000);
 
-//       const State* parent_state = curr_node->parent ? &curr_node->parent->state : nullptr;
-//       auto neighbors = get_neighbors(curr_node->state, parent_state);
-//       std::reverse(neighbors.begin(), neighbors.end());
+  uint64_t node_counter = 0;
+  node_storage.emplace_back(start_state, 0, nullptr, node_counter++);
+  Node* start_node = &node_storage.back();
 
-//       for (const auto& nb : neighbors) {
-//         std::shared_ptr<Node> nb_node(new Node(nb, curr_node->g + 1, curr_node));
-//         frontier.push(nb_node);
-//       }
-//     }
-//     depth_lim++;
-//     if (depth_lim >= MAX_DEPTH) break;
-//   }
-//   sol.time = get_elapsed_time(start_time);
-//   return sol;
-// }
+  sol.start_h = (int)start_node->h;
+  sol.avg_h += (double)start_node->h;
+  sol.root = start_node;
 
-// Solution greedy_best_first(const State& start_state) {
-//   Solution sol;
-//   time_point start_time = timer::now();
+  std::vector<State> neighbors_buffer;
+  neighbors_buffer.reserve(4);
 
-//   uint64_t node_counter = 0;
-//   std::shared_ptr<Node> start_node(new Node(start_state, 0, nullptr, node_counter++));
-//   sol.start_h = start_node->h;
-//   sol.avg_h += start_node->h;
-//   sol.root = start_node;
+  int depth_lim = 0;
 
-//   if (start_node->h == 0) {
-//     sol.time = get_elapsed_time(start_time);
-//     sol.sol_depth = start_node->g;
-//     sol.avg_h /= (float)node_counter;
-//     sol.path.push_front(start_state);
-//     return sol;
-//   }
-//   std::priority_queue<std::shared_ptr<Node>, std::vector<std::shared_ptr<Node>>, GreedyCompare> frontier;
-//   std::unordered_map<State, bool, StateHasher> explored;
+  while (true) {
+    std::stack<Node*> frontier;
+    frontier.push(start_node);
 
-//   frontier.push(start_node);
-//   explored[start_state] = true;
+    while (!frontier.empty()) {
+      Node* curr_node = frontier.top();
+      frontier.pop();
 
-//   while (!frontier.empty()) {
-//     std::shared_ptr<Node> curr_node = frontier.top();
-//     frontier.pop();
+      if (curr_node->h == 0) {
+        sol.sol_depth = curr_node->g;
+        Node* temp = curr_node;
+        while (temp != nullptr) {
+          sol.path.push_back(temp->state);
+          temp = temp->parent;
+        }
+        std::reverse(sol.path.begin(), sol.path.end());
+        return sol;
+      }
+      if (curr_node->g > depth_lim) continue;
 
-//     sol.n_expanded++;
+      sol.n_expanded++;
 
-//     for (const auto& nb : get_neighbors(curr_node->state)) {
-//       if (explored.find(nb) == explored.end()) {
-//         std::shared_ptr<Node> nb_node(new Node(nb, curr_node->g + 1, curr_node, node_counter++));
-//         sol.avg_h += nb_node->h;
-//         if (nb_node->h == 0) {
-//           sol.time = get_elapsed_time(start_time);
-//           sol.sol_depth = nb_node->g;
-//           sol.avg_h /= (float)node_counter;
-//           std::shared_ptr<Node> temp = nb_node;
-//           while (temp != nullptr) {
-//             sol.path.push_front(temp->state);
-//             temp = temp->parent;
-//           }
-//           return sol;
-//         }
-//         frontier.push(nb_node);
-//         explored[nb] = true;
-//       }
-//     }
-//   }
-//   sol.time = get_elapsed_time(start_time);
-//   if (sol.n_expanded > 0) sol.avg_h /= (float)sol.n_expanded;
-//   return sol;
-// }
+      State parent_state = curr_node->parent ? curr_node->parent->state : 0x0llu;
+      neighbors_buffer.clear();
+      get_neighbors(curr_node->state, size, parent_state, neighbors_buffer);
+
+      for (const auto& nb : neighbors_buffer) {
+        node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, node_counter++);
+        frontier.push(&node_storage.back());
+      }
+    }
+    depth_lim++;
+    if (depth_lim >= MAX_DEPTH) break;
+  }
+  return sol;
+}
+
+Solution greedy_best_first(State start_state, int size) {
+  Solution sol;
+
+  std::vector<Node> node_storage;
+  node_storage.reserve(500000000);
+
+  uint64_t node_counter = 0;
+  node_storage.emplace_back(start_state, 0, nullptr, size, node_counter++);
+  Node* start_node = &node_storage.back();
+
+  sol.start_h = (int)start_node->h;
+  sol.avg_h += (double)start_node->h;
+  sol.root = start_node;
+
+  if (start_node->h == 0) {
+    sol.sol_depth = start_node->g;
+    sol.avg_h /= (float)node_counter;
+    sol.path.push_back(start_state);
+    return sol;
+  }
+  GreedyPQueue frontier(5000);
+  std::unordered_set<State> closed_set;
+
+  std::vector<State> neighbors_buffer;
+  neighbors_buffer.reserve(4);
+
+  frontier.push(start_node);
+  closed_set.insert(start_state);
+
+  while (!frontier.empty()) {
+    Node* curr_node = frontier.top();
+    frontier.pop();
+
+    sol.n_expanded++;
+
+    State parent_state = curr_node->parent ? curr_node->parent->state : 0x0llu;
+    neighbors_buffer.clear();
+    get_neighbors(curr_node->state, size, parent_state, neighbors_buffer);
+
+    for (const auto& nb : neighbors_buffer) {
+      if (closed_set.find(nb) == closed_set.end()) {
+        node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, node_counter++);
+        Node* nb_node = &node_storage.back();
+        sol.avg_h += (double)nb_node->h;
+        if (nb_node->h == 0) {
+          sol.sol_depth = nb_node->g;
+          sol.avg_h /= (double)node_counter;
+          Node* temp = nb_node;
+          while (temp != nullptr) {
+            sol.path.push_back(temp->state);
+            temp = temp->parent;
+          }
+          std::reverse(sol.path.begin(), sol.path.end());
+          return sol;
+        }
+        frontier.push(nb_node);
+        closed_set.insert(nb);
+      }
+    }
+  }
+  sol.avg_h /= (double)node_counter;
+  return sol;
+}
 
 Solution astar(State start_state, int size) {
   Solution sol;

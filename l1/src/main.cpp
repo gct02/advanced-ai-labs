@@ -125,14 +125,14 @@ void run_algorithm(const std::string &algorithm, const std::vector<uint8_t> &sta
 //    std::shared_ptr<Node> root_astar = sol.root;
 //    print_graph("graph_astar.txt", root_astar);
 
-  // } else if (algorithm == "-bfs") {
-  //   sol = bfs_graph(state);
+  } else if (algorithm == "-bfs") {
+    sol = bfs_graph(compact_state, state.size());
   } else if (algorithm == "-idastar") {
     sol = idastar(compact_state, state.size());
-  // } else if (algorithm == "-idfs") {
-  //   sol = iter_deep(state);
-  // } else if (algorithm == "-gbfs") {
-  //   sol = greedy_best_first(state);
+  } else if (algorithm == "-idfs") {
+    sol = iter_deep(compact_state, state.size());
+  } else if (algorithm == "-gbfs") {
+    sol = greedy_best_first(compact_state, state.size());
   } else {
     std::cerr << "Error: Unknown algorithm " << algorithm << "\n";
     print_usage();
