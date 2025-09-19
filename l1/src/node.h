@@ -9,6 +9,8 @@
 
 using State = uint64_t;
 
+void precompute_goal_positions(int size);
+
 // Heuristic: Manhattan Distance.
 uint8_t manhattan_dist(State state, int size);
 
@@ -31,9 +33,8 @@ struct Node
   uint16_t g; // Cost from start to current node
   uint8_t h; // Heuristic cost estimate to goal
 
-  Node(State s, int g_cost, Node* par, int size, uint32_t id_num = 0)
-    : state(s), g(g_cost), parent(par), id(id_num), h(manhattan_dist(state, size))
-  { f = g + h; }
+  Node(State s, int g_cost, Node* par, int size, uint8_t h_cost, uint32_t id_num = 0)
+    : state(s), g(g_cost), parent(par), h(h_cost), f(g_cost + h_cost), id(id_num) {}
 };
 
 #endif // NODE_H

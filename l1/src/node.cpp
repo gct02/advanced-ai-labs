@@ -2,19 +2,46 @@
 #include <inttypes.h>
 #include "node.h"
 
+uint8_t goal_x[16];
+uint8_t goal_y[16];
+
+void precompute_goal_positions(int size) {
+    uint8_t n = (size == 9) ? 3 : 4;
+    for (uint8_t i = 0; i < size; ++i) {
+        goal_x[i] = i % n;
+        goal_y[i] = i / n;
+    }
+}
+
 // Heuristic: Manhattan Distance.
 uint8_t manhattan_dist(State state, int size) {
-  uint8_t h = 0;
-  uint8_t n = size == 9 ? 3 : 4;
-  for (uint8_t i = 0; i < (uint8_t)size; i++) {
-    uint8_t val = (uint8_t)(state & 0xfull);
-    state >>= 4;
-    if (val != 0) {
-      h += abs(i / n - val / n) + abs(i % n - val % n);
+    uint8_t h = 0;
+    uint8_t n = (size == 9) ? 3 : 4;
+
+    for (uint8_t i = 0; i < (uint8_t)size; i++) {
+        uint8_t val = (uint8_t)(state & 0xfull);
+        state >>= 4;
+        if (val != 0) {
+            uint8_t curr_x = i % n;
+            uint8_t curr_y = i / n;
+            h += abs(curr_x - goal_x[val]) + abs(curr_y - goal_y[val]);
+        }
     }
-  }
-  return h;
+    return h;
 }
+
+// uint8_t manhattan_dist(State state, int size) {
+//   uint8_t h = 0;
+//   uint8_t n = size == 9 ? 3 : 4;
+//   for (uint8_t i = 0; i < (uint8_t)size; i++) {
+//     uint8_t val = (uint8_t)(state & 0xfull);
+//     state >>= 4;
+//     if (val != 0) {
+//       h += abs(i / n - val / n) + abs(i % n - val % n);
+//     }
+//   }
+//   return h;
+// }
 
 int get_zero_index(State state, int size) {
   int i = 0;

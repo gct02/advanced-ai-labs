@@ -45,16 +45,18 @@ public:
 };
 
 Solution bfs_graph(State start_state, int size) {
-  Solution sol;
+  precompute_goal_positions(size);
 
+  Solution sol;
   std::vector<Node> node_storage;
   node_storage.reserve(BUFF_SIZE);
 
-  uint64_t node_counter = 0;
-  node_storage.emplace_back(start_state, 0, nullptr, size, node_counter++);
+  uint32_t node_counter = 0;
+  uint8_t start_h = manhattan_dist(start_state, size);
+  node_storage.emplace_back(start_state, 0, nullptr, size, start_h, node_counter++);
   Node* start_node = &node_storage.back();
 
-  sol.start_h = (int)start_node->h;
+  sol.start_h = (int)start_h;
   sol.root = start_node;
 
   std::vector<State> neighbors_buffer;
@@ -81,10 +83,11 @@ Solution bfs_graph(State start_state, int size) {
     get_neighbors(curr_node->state, size, parent_state, neighbors_buffer);
 
     for (const auto& nb : neighbors_buffer) {
+      uint8_t h = manhattan_dist(nb, size);
       if (closed_set.find(nb) == closed_set.end()) {
-        node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, node_counter++);
+        node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, h, node_counter++);
         Node* nb_node = &node_storage.back();
-        if (nb_node->h == 0) {
+        if (h == 0) {
           sol.sol_depth = nb_node->g;
           Node* temp = nb_node;
           while (temp != nullptr) {
@@ -103,15 +106,18 @@ Solution bfs_graph(State start_state, int size) {
 }
 
 Solution iter_deep(State start_state, int size) {
+  precompute_goal_positions(size);
+
   Solution sol;
   std::vector<Node> node_storage;
   node_storage.reserve(BUFF_SIZE);
 
-  uint64_t node_counter = 0;
-  node_storage.emplace_back(start_state, 0, nullptr, size, node_counter++);
+  uint32_t node_counter = 0;
+  uint8_t start_h = manhattan_dist(start_state, size);
+  node_storage.emplace_back(start_state, 0, nullptr, size, start_h, node_counter++);
   Node* start_node = &node_storage.back();
 
-  sol.start_h = (int)start_node->h;
+  sol.start_h = (int)start_h;
   sol.root = start_node;
 
   std::vector<State> neighbors_buffer;
@@ -147,7 +153,8 @@ Solution iter_deep(State start_state, int size) {
       std::reverse(neighbors_buffer.begin(), neighbors_buffer.end());
 
       for (const auto& nb : neighbors_buffer) {
-        node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, node_counter++);
+        uint8_t h = manhattan_dist(nb, size);
+        node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, h, node_counter++);
         frontier.push(&node_storage.back());
       }
     }
@@ -158,21 +165,26 @@ Solution iter_deep(State start_state, int size) {
 }
 
 Solution greedy_best_first(State start_state, int size) {
+  precompute_goal_positions(size);
+
   Solution sol;
   std::vector<Node> node_storage;
   node_storage.reserve(BUFF_SIZE);
 
-  uint64_t node_counter = 0;
-  node_storage.emplace_back(start_state, 0, nullptr, size, node_counter++);
+  uint32_t node_counter = 0;
+  uint8_t start_h = manhattan_dist(start_state, size);
+  node_storage.emplace_back(start_state, 0, nullptr, size, start_h, node_counter++);
   Node* start_node = &node_storage.back();
 
-  sol.start_h = (int)start_node->h;
-  sol.avg_h += (double)start_node->h;
+  sol.start_h = (int)start_h;
   sol.root = start_node;
+
+  int n_explored = 1;
+  int h_sum = start_node->h;
 
   if (start_node->h == 0) {
     sol.sol_depth = start_node->g;
-    sol.avg_h /= (float)node_counter;
+    sol.avg_h = (double)h_sum;
     sol.path.push_back(start_state);
     return sol;
   }
@@ -197,12 +209,17 @@ Solution greedy_best_first(State start_state, int size) {
 
     for (const auto& nb : neighbors_buffer) {
       if (closed_set.find(nb) == closed_set.end()) {
-        node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, node_counter++);
+        uint8_t h = manhattan_dist(nb, size);
+        
+        h_sum += (int)h;
+        n_explored++;
+
+        node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, h, node_counter++);
         Node* nb_node = &node_storage.back();
-        sol.avg_h += (double)nb_node->h;
-        if (nb_node->h == 0) {
+
+        if (h == 0) {
           sol.sol_depth = nb_node->g;
-          sol.avg_h /= (double)node_counter;
+          sol.avg_h = h_sum / (double)n_explored;
           Node* temp = nb_node;
           while (temp != nullptr) {
             sol.path.push_back(temp->state);
@@ -221,33 +238,33 @@ Solution greedy_best_first(State start_state, int size) {
 }
 
 Solution astar(State start_state, int size) {
+  precompute_goal_positions(size);
+
   Solution sol;
   std::vector<Node> node_storage;
   node_storage.reserve(BUFF_SIZE);
 
   uint32_t node_counter = 0;
-  node_storage.emplace_back(start_state, 0, nullptr, size, node_counter++);
+  uint8_t start_h = manhattan_dist(start_state, size);
+  node_storage.emplace_back(start_state, 0, nullptr, size, start_h, node_counter++);
   Node* start_node = &node_storage.back();
 
-  sol.start_h = (int)start_node->h;
+  sol.start_h = (int)start_h;
   sol.root = start_node;
 
   int n_explored = 1;
-  int64_t h_sum = (int64_t)start_node->h;
+  int h_sum = start_node->h;
 
   std::vector<State> neighbors_buffer;
   neighbors_buffer.reserve(4);
 
   AstarPQueue frontier(QUEUE_SIZE);
-  std::unordered_set<State> closed_set;
+  std::unordered_map<State, uint8_t> closed_map;
   frontier.push(start_node);
 
   while (!frontier.empty()) {
     Node* curr_node = frontier.top();
     frontier.pop();
-
-    h_sum += (int64_t)curr_node->h;
-    n_explored++;
 
     if (curr_node->h == 0) {
       sol.sol_depth = (int)curr_node->g;
@@ -260,10 +277,10 @@ Solution astar(State start_state, int size) {
       std::reverse(sol.path.begin(), sol.path.end());
       return sol;
     }
-    if (closed_set.find(curr_node->state) != closed_set.end()) {
+    if (closed_map.find(curr_node->state) != closed_map.end()) {
       continue;
     }
-    closed_set.insert(curr_node->state);
+    closed_map[curr_node->state] = curr_node->h;
     sol.n_expanded++;
 
     State parent_state = curr_node->parent ? curr_node->parent->state : 0x0llu;
@@ -271,14 +288,17 @@ Solution astar(State start_state, int size) {
     get_neighbors(curr_node->state, size, parent_state, neighbors_buffer);
 
     for (const auto& nb : neighbors_buffer) {
-      if (closed_set.find(nb) != closed_set.end()) {
+      auto it = closed_map.find(nb);
+      if (it != closed_map.end()) {
+        h_sum += (int)it->second;
+        n_explored++;
         continue;
       }
-      node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, node_counter++);
-      Node* nb_node = &node_storage.back();
-      frontier.push(nb_node);
-      h_sum += (int64_t)nb_node->h;
+      uint8_t h = manhattan_dist(nb, size);
+      h_sum += (int)h;
       n_explored++;
+      node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, h, node_counter++);
+      frontier.push(&node_storage.back());
     }
   }
   sol.avg_h = h_sum / (double)n_explored;
@@ -286,16 +306,23 @@ Solution astar(State start_state, int size) {
 }
 
 Solution idastar(State start_state, int size) {
+  precompute_goal_positions(size);
+
   Solution sol;
   std::unordered_map<State, Node*> node_store;
   node_store.reserve(BUFF_SIZE_ID);
 
   uint32_t node_counter = 0;
-  node_store[start_state] = new Node(start_state, 0, nullptr, size, node_counter++);
-  Node* start_node = node_store[start_state];
+  uint8_t start_h = manhattan_dist(start_state, size);
+  Node* start_node = new Node(start_state, 0, nullptr, size, start_h, node_counter++);
+  node_store[start_state] = start_node;
 
-  sol.start_h = (int)start_node->h;
-  sol.avg_h += (double)start_node->h;
+  sol.start_h = (int)start_h;
+
+  // int h_sum = sol.start_h;
+  // int n_explored = 1;
+  int h_sum = 0;
+  int n_explored = 0;
 
   std::vector<State> neighbors_buffer;
   neighbors_buffer.reserve(4);
@@ -311,13 +338,19 @@ Solution idastar(State start_state, int size) {
     frontier.clear();
     frontier.push_back(start_node);
 
+    // h_sum += sol.start_h;
+    // n_explored += 1;
+
     while (!frontier.empty()) {
       Node* curr_node = frontier.back();
       frontier.pop_back();
 
+      h_sum += curr_node->h;
+      n_explored++;
+
       if (curr_node->h == 0) {
         sol.sol_depth = (int)curr_node->g;
-        if (sol.n_expanded > 0) sol.avg_h /= (double)sol.n_expanded;
+        sol.avg_h = h_sum / (double)n_explored;
         Node* temp = curr_node;
         while (temp != nullptr) {
           sol.path.push_back(temp->state);
@@ -342,13 +375,17 @@ Solution idastar(State start_state, int size) {
       std::reverse(neighbors_buffer.begin(), neighbors_buffer.end());
 
       for (const auto& nb : neighbors_buffer) {
-        auto it = node_store.find(nb);
-        if (it != node_store.end() && it->second->g < curr_node->g + 1) {
-          continue;
-        }
-        node_store[nb] = new Node(nb, curr_node->g + 1, curr_node, size, node_counter++);
-        Node* nb_node = node_store[nb];
-        sol.avg_h += (double)nb_node->h;
+        // auto it = node_store.find(nb);
+        // if (it != node_store.end() && it->second->g < curr_node->g + 1) {
+        //   continue;
+        // }
+        uint8_t h = manhattan_dist(nb, size);
+
+        // h_sum += (int)h;
+        // n_explored++;
+
+        Node* nb_node = new Node(nb, curr_node->g + 1, curr_node, size, h, node_counter++);
+        node_store[nb] = nb_node;
         frontier.push_back(nb_node);
       }
     }
