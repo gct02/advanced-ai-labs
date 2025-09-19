@@ -71,7 +71,7 @@ State make_compact_state(const std::vector<uint8_t>& state_vec) {
   for (int i = 0; i < (int)state_vec.size(); i++) {
     state |= ((uint64_t)state_vec[i]) << (i * 4);
   }
-  printf("state = 0x%" PRIx64 "\n", state);
+  // printf("state = 0x%" PRIx64 "\n", state);
   return state;
 }
 

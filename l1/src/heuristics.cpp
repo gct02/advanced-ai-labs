@@ -22,10 +22,14 @@
 #define MAX_DEPTH 1000
 #define MAX_H 100
 
+#define BUFF_SIZE 500000000
+#define BUFF_SIZE_ID 500000
+#define QUEUE_SIZE 5000
+
 class AstarPQueue : public std::priority_queue<Node*, std::vector<Node*>, AstarCompare>
 {
 public:
-  AstarPQueue(size_t reserve_size = 5000)
+  AstarPQueue(size_t reserve_size = QUEUE_SIZE)
   {
     this->c.reserve(reserve_size);
   }
@@ -34,7 +38,7 @@ public:
 class GreedyPQueue : public std::priority_queue<Node*, std::vector<Node*>, GreedyCompare>
 {
 public:
-  GreedyPQueue(size_t reserve_size = 5000)
+  GreedyPQueue(size_t reserve_size = QUEUE_SIZE)
   {
     this->c.reserve(reserve_size);
   }
@@ -44,14 +48,13 @@ Solution bfs_graph(State start_state, int size) {
   Solution sol;
 
   std::vector<Node> node_storage;
-  node_storage.reserve(500000000);
+  node_storage.reserve(BUFF_SIZE);
 
   uint64_t node_counter = 0;
   node_storage.emplace_back(start_state, 0, nullptr, size, node_counter++);
   Node* start_node = &node_storage.back();
 
   sol.start_h = (int)start_node->h;
-  sol.avg_h += (double)start_node->h;
   sol.root = start_node;
 
   std::vector<State> neighbors_buffer;
@@ -101,16 +104,14 @@ Solution bfs_graph(State start_state, int size) {
 
 Solution iter_deep(State start_state, int size) {
   Solution sol;
-
   std::vector<Node> node_storage;
-  node_storage.reserve(500000000);
+  node_storage.reserve(BUFF_SIZE);
 
   uint64_t node_counter = 0;
-  node_storage.emplace_back(start_state, 0, nullptr, node_counter++);
+  node_storage.emplace_back(start_state, 0, nullptr, size, node_counter++);
   Node* start_node = &node_storage.back();
 
   sol.start_h = (int)start_node->h;
-  sol.avg_h += (double)start_node->h;
   sol.root = start_node;
 
   std::vector<State> neighbors_buffer;
@@ -143,6 +144,7 @@ Solution iter_deep(State start_state, int size) {
       State parent_state = curr_node->parent ? curr_node->parent->state : 0x0llu;
       neighbors_buffer.clear();
       get_neighbors(curr_node->state, size, parent_state, neighbors_buffer);
+      std::reverse(neighbors_buffer.begin(), neighbors_buffer.end());
 
       for (const auto& nb : neighbors_buffer) {
         node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, node_counter++);
@@ -157,9 +159,8 @@ Solution iter_deep(State start_state, int size) {
 
 Solution greedy_best_first(State start_state, int size) {
   Solution sol;
-
   std::vector<Node> node_storage;
-  node_storage.reserve(500000000);
+  node_storage.reserve(BUFF_SIZE);
 
   uint64_t node_counter = 0;
   node_storage.emplace_back(start_state, 0, nullptr, size, node_counter++);
@@ -175,7 +176,7 @@ Solution greedy_best_first(State start_state, int size) {
     sol.path.push_back(start_state);
     return sol;
   }
-  GreedyPQueue frontier(5000);
+  GreedyPQueue frontier(QUEUE_SIZE);
   std::unordered_set<State> closed_set;
 
   std::vector<State> neighbors_buffer;
@@ -221,23 +222,23 @@ Solution greedy_best_first(State start_state, int size) {
 
 Solution astar(State start_state, int size) {
   Solution sol;
-  // time_point start_time = timer::now();
-
   std::vector<Node> node_storage;
-  node_storage.reserve(500000000);
+  node_storage.reserve(BUFF_SIZE);
 
   uint32_t node_counter = 0;
   node_storage.emplace_back(start_state, 0, nullptr, size, node_counter++);
   Node* start_node = &node_storage.back();
 
   sol.start_h = (int)start_node->h;
-  sol.avg_h = (double)start_node->h;
   sol.root = start_node;
+
+  int n_explored = 1;
+  int64_t h_sum = (int64_t)start_node->h;
 
   std::vector<State> neighbors_buffer;
   neighbors_buffer.reserve(4);
 
-  AstarPQueue frontier(5000);
+  AstarPQueue frontier(QUEUE_SIZE);
   std::unordered_set<State> closed_set;
   frontier.push(start_node);
 
@@ -245,10 +246,12 @@ Solution astar(State start_state, int size) {
     Node* curr_node = frontier.top();
     frontier.pop();
 
+    h_sum += (int64_t)curr_node->h;
+    n_explored++;
+
     if (curr_node->h == 0) {
-      // sol.time = get_elapsed_time(start_time);
       sol.sol_depth = (int)curr_node->g;
-      sol.avg_h /= (double)node_counter;
+      sol.avg_h = h_sum / (double)n_explored;
       Node* temp = curr_node;
       while (temp != nullptr) {
         sol.path.push_back(temp->state);
@@ -274,20 +277,18 @@ Solution astar(State start_state, int size) {
       node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, node_counter++);
       Node* nb_node = &node_storage.back();
       frontier.push(nb_node);
-      sol.avg_h += (double)nb_node->h;
+      h_sum += (int64_t)nb_node->h;
+      n_explored++;
     }
   }
-  // sol.time = get_elapsed_time(start_time);
-  sol.avg_h /= (double)sol.n_expanded;
+  sol.avg_h = h_sum / (double)n_explored;
   return sol;
 }
 
 Solution idastar(State start_state, int size) {
   Solution sol;
-  // time_point start_time = timer::now();
-
   std::unordered_map<State, Node*> node_store;
-  node_store.reserve(500000);
+  node_store.reserve(BUFF_SIZE_ID);
 
   uint32_t node_counter = 0;
   node_store[start_state] = new Node(start_state, 0, nullptr, size, node_counter++);
@@ -302,7 +303,7 @@ Solution idastar(State start_state, int size) {
   uint16_t threshold = start_node->f;
 
   std::vector<Node*> frontier;
-  frontier.reserve(5000);
+  frontier.reserve(QUEUE_SIZE);
 
   while (true) {
     uint16_t next_threshold = UINT16_MAX;
@@ -315,7 +316,6 @@ Solution idastar(State start_state, int size) {
       frontier.pop_back();
 
       if (curr_node->h == 0) {
-        // sol.time = get_elapsed_time(start_time);
         sol.sol_depth = (int)curr_node->g;
         if (sol.n_expanded > 0) sol.avg_h /= (double)sol.n_expanded;
         Node* temp = curr_node;
@@ -355,7 +355,6 @@ Solution idastar(State start_state, int size) {
     threshold = next_threshold;
     if (threshold == UINT16_MAX) break;
   }
-  // sol.time = get_elapsed_time(start_time);
   if (sol.n_expanded > 0) sol.avg_h /= (double)sol.n_expanded;
   return sol;
 }

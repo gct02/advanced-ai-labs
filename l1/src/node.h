@@ -26,9 +26,9 @@ struct Node
 {
   State state;
   Node* parent; // Pointer to parent node for path reconstruction
+  uint32_t id; // Unique sequence number for LIFO tie-breaking
   uint16_t f; // Total estimated cost
   uint16_t g; // Cost from start to current node
-  uint32_t id; // Unique sequence number for LIFO tie-breaking
   uint8_t h; // Heuristic cost estimate to goal
 
   Node(State s, int g_cost, Node* par, int size, uint32_t id_num = 0)
