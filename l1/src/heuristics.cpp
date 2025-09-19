@@ -189,18 +189,29 @@ Solution greedy_best_first(State start_state, int size) {
     return sol;
   }
   GreedyPQueue frontier(QUEUE_SIZE);
-  std::unordered_set<State> closed_set;
+  std::unordered_map<State, uint8_t> closed_map;
 
   std::vector<State> neighbors_buffer;
   neighbors_buffer.reserve(4);
 
   frontier.push(start_node);
-  closed_set.insert(start_state);
+  closed_map[start_state] = start_h;
 
   while (!frontier.empty()) {
     Node* curr_node = frontier.top();
     frontier.pop();
 
+    if (curr_node->h == 0) {
+      sol.sol_depth = curr_node->g;
+      sol.avg_h = h_sum / (double)n_explored;
+      Node* temp = curr_node;
+      while (temp != nullptr) {
+        sol.path.push_back(temp->state);
+        temp = temp->parent;
+      }
+      std::reverse(sol.path.begin(), sol.path.end());
+      return sol;
+    }
     sol.n_expanded++;
 
     State parent_state = curr_node->parent ? curr_node->parent->state : 0x0llu;
@@ -208,29 +219,20 @@ Solution greedy_best_first(State start_state, int size) {
     get_neighbors(curr_node->state, size, parent_state, neighbors_buffer);
 
     for (const auto& nb : neighbors_buffer) {
-      if (closed_set.find(nb) == closed_set.end()) {
-        uint8_t h = manhattan_dist(nb, size);
-        
-        h_sum += (int)h;
+      auto it = closed_map.find(nb);
+      if (it != closed_map.end()) {
+        h_sum += (int)it->second;
         n_explored++;
-
-        node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, h, node_counter++);
-        Node* nb_node = &node_storage.back();
-
-        if (h == 0) {
-          sol.sol_depth = nb_node->g;
-          sol.avg_h = h_sum / (double)n_explored;
-          Node* temp = nb_node;
-          while (temp != nullptr) {
-            sol.path.push_back(temp->state);
-            temp = temp->parent;
-          }
-          std::reverse(sol.path.begin(), sol.path.end());
-          return sol;
-        }
-        frontier.push(nb_node);
-        closed_set.insert(nb);
+        continue;
       }
+      uint8_t h = manhattan_dist(nb, size);
+      
+      h_sum += (int)h;
+      n_explored++;
+
+      node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, h, node_counter++);
+      frontier.push(&node_storage.back());
+      closed_map[nb] = h;
     }
   }
   sol.avg_h /= (double)node_counter;
