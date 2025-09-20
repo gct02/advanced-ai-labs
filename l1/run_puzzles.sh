@@ -1,11 +1,14 @@
 #!/bin/bash
-
 # Script: run_puzzles.sh
 # Usage: ./run_puzzles.sh -astar puzzle_file.txt
 #        ./run_puzzles.sh -bfs puzzle_file.txt
 #        ./run_puzzles.sh -idastar puzzle_file.txt
 #        ./run_puzzles.sh -idfs puzzle_file.txt
 #        ./run_puzzles.sh -gbfs puzzle_file.txt
+
+# Memory limit in KB (12GB = 12 * 1024 * 1024 KB)
+GB_MEMORY_LIMIT=8
+MEMORY_LIMIT=$(($GB_MEMORY_LIMIT * 1024 * 1024))
 
 # Function to display usage
 usage() {
@@ -50,7 +53,14 @@ fi
 chmod +x ./main
 
 echo "Running $ALGORITHM on puzzles from $PUZZLE_FILE"
+echo "Memory limit: $GB_MEMORY_LIMIT GB"
 echo "================================================"
+
+# Initialize counters
+TOTAL_PUZZLES=0
+SUCCESSFUL_PUZZLES=0
+FAILED_PUZZLES=0
+MEMORY_EXCEEDED=0
 
 # Read each line from the puzzle file and execute the program
 LINE_NUMBER=1
@@ -70,11 +80,39 @@ while IFS= read -r line; do
     
     echo "Puzzle $LINE_NUMBER: $line"
     
-    # Execute the main program with the algorithm and current puzzle
-    ./main "$ALGORITHM" $line
+    # Execute the main program with memory limit using ulimit
+    # Use timeout as an additional safety measure
+    (ulimit -v $MEMORY_LIMIT && timeout 30 ./main "$ALGORITHM" $line)
     
+    # Capture the exit status
+    EXIT_STATUS=$?
+    
+    # Check the exit status
+    if [ $EXIT_STATUS -eq 0 ]; then
+        echo "✓ Puzzle $LINE_NUMBER: SUCCESS"
+        SUCCESSFUL_PUZZLES=$((SUCCESSFUL_PUZZLES + 1))
+    else
+        # Other error codes
+        echo "✗ Puzzle $LINE_NUMBER: FAILED - Exit code: $EXIT_STATUS"
+        FAILED_PUZZLES=$((FAILED_PUZZLES + 1))
+    fi
+    
+    TOTAL_PUZZLES=$((TOTAL_PUZZLES + 1))
     LINE_NUMBER=$((LINE_NUMBER + 1))
     echo "--------------------------------"
 done < "$PUZZLE_FILE"
 
-echo "Completed processing $((LINE_NUMBER - 1)) puzzles"
+echo "================================================"
+echo "SUMMARY:"
+echo "Total puzzles processed: $TOTAL_PUZZLES"
+echo "Successful puzzles: $SUCCESSFUL_PUZZLES"
+echo "Failed puzzles: $FAILED_PUZZLES"
+echo "================================================"
+echo "COMPLETION: $SUCCESSFUL_PUZZLES out of $TOTAL_PUZZLES puzzles completed successfully"
+
+# Return appropriate exit code
+if [ $FAILED_PUZZLES -eq 0 ]; then
+    exit 0
+else
+    exit 1
+fi

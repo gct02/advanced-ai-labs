@@ -3,6 +3,7 @@
 import subprocess
 
 # script para testar corretude das soluções dos exemplos do pdf
+# é basicamente o compare.py antigo
 
 
 def run_test(algorithm, puzzles, expected_output, test_name):

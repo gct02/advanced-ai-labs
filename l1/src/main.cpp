@@ -3,8 +3,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-// #include <memory>
-// #include <queue>
 #include "heuristics.h"
 #include <cstring>
 #include <chrono>
@@ -31,32 +29,6 @@ std::vector<uint8_t> split(std::string s) {
   res.push_back((uint8_t)std::stoi(s.substr(pos_start)));
   return res;
 }
-
-// Not used currently, uncomment the "astar" part in the run_algorithm function
-// to use again
-// void print_graph(const std::string &filename, std::shared_ptr<Node> root) {
-//   std::ofstream out(filename);
-//   std::queue<std::shared_ptr<Node>> queue;
-//   std::shared_ptr<Node> pred = nullptr;
-//   std::shared_ptr<Node> curr = nullptr;
-//   queue.push(root);
-
-//   while (!queue.empty()) {
-//     std::shared_ptr<Node> curr = queue.front();
-//     queue.pop();
-//     if (pred) {
-//       if (pred->g < curr->g)
-//         out << "\n";
-//       else
-//         out << " ";
-//     }
-//     out << state_to_string(curr->state);
-//     for (auto child : curr->children) {
-//       queue.push(child);
-//     }
-//     pred = curr;
-//   }
-// }
 
 void print_usage() {
   std::cout << "Usage: ./main <algorithm> <puzzle1> <puzzle2> ...\n";
@@ -122,9 +94,6 @@ void run_algorithm(const std::string &algorithm, const std::vector<uint8_t> &sta
   time_point start_time = timer::now();
   if (algorithm == "-astar") {
     sol = astar(compact_state, state.size());
-//    std::shared_ptr<Node> root_astar = sol.root;
-//    print_graph("graph_astar.txt", root_astar);
-
   } else if (algorithm == "-bfs") {
     sol = bfs_graph(compact_state, state.size());
   } else if (algorithm == "-idastar") {
