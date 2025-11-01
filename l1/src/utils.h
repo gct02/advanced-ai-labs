@@ -6,24 +6,30 @@
 #include <limits>
 #include "node.h"
 
+#define QUEUE_SIZE 1000
+
 // Custom Compare for A* priority queue.
-struct AstarCompare : public std::binary_function<Node*, Node*, bool> 
-{
+struct AstarCompare : public std::binary_function<Node*, Node*, bool> {
   bool operator()(const Node* lhs, const Node* rhs) const;
 };
 
 // Custom Compare for Greedy Best-First Search priority queue.
-struct GreedyCompare : public std::binary_function<Node*, Node*, bool> 
-{
+struct GreedyCompare : public std::binary_function<Node*, Node*, bool> {
   bool operator()(const Node* lhs, const Node* rhs) const;
 };
 
-// Hasher for States (uint8_t vectors).
-// Adapted from https://stackoverflow.com/questions/20511347/a-good-hash-function-for-a-vector.
-class StateHasher 
-{
+class AstarPQueue : public std::priority_queue<Node*, std::vector<Node*>, AstarCompare> {
 public:
-  std::size_t operator()(std::vector<uint8_t> const& s) const;
+  AstarPQueue(size_t reserve_size = QUEUE_SIZE) {
+    this->c.reserve(reserve_size);
+  }
+};
+
+class GreedyPQueue : public std::priority_queue<Node*, std::vector<Node*>, GreedyCompare> {
+public:
+  GreedyPQueue(size_t reserve_size = QUEUE_SIZE) {
+    this->c.reserve(reserve_size);
+  }
 };
 
 #endif // MY_UTILS_H

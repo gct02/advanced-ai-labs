@@ -20,25 +20,6 @@
 #include "heuristics.h"
 
 #define BUFF_SIZE 300000000
-#define QUEUE_SIZE 1000
-
-class AstarPQueue : public std::priority_queue<Node*, std::vector<Node*>, AstarCompare>
-{
-public:
-  AstarPQueue(size_t reserve_size = QUEUE_SIZE)
-  {
-    this->c.reserve(reserve_size);
-  }
-};
-
-class GreedyPQueue : public std::priority_queue<Node*, std::vector<Node*>, GreedyCompare>
-{
-public:
-  GreedyPQueue(size_t reserve_size = QUEUE_SIZE)
-  {
-    this->c.reserve(reserve_size);
-  }
-};
 
 Solution bfs_graph(State start_state, int size) {
   precompute_goal_positions(size);
@@ -229,13 +210,10 @@ Solution astar(State start_state, int size) {
   precompute_goal_positions(size);
 
   Solution sol;
-  std::vector<Node> node_storage;
-  node_storage.reserve(BUFF_SIZE);
 
   uint32_t node_counter = 0;
   uint8_t start_h = manhattan_dist(start_state, size);
-  node_storage.emplace_back(start_state, 0, nullptr, size, start_h, node_counter++);
-  Node* start_node = &node_storage.back();
+  Node* start_node = new Node(start_state, 0, nullptr, size, start_h, node_counter++);
 
   sol.start_h = (int)start_h;
   sol.root = start_node;
@@ -287,8 +265,8 @@ Solution astar(State start_state, int size) {
       h_sum += (int)h;
       n_explored++;
 
-      node_storage.emplace_back(nb, curr_node->g + 1, curr_node, size, h, node_counter++);
-      frontier.push(&node_storage.back());
+      Node* nb_node = new Node(nb, curr_node->g + 1, curr_node, size, h, node_counter++);
+      frontier.push(nb_node);
     }
   }
   sol.avg_h = h_sum / (double)n_explored;
