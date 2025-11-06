@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 #include <unordered_set>
 #include <queue>
 
@@ -20,43 +21,41 @@ RelaxedTaskGraph::RelaxedTaskGraph(const TaskProxy &task_proxy)
         - the graph should contain all necessary edges.
     */
 
-    for (auto var : task_proxy.get_variables()) {
-        NodeID n = this->graph.add_node(NodeType::OR);
-        this->variable_node_ids.push_back(n);
-        this->id_map[var.get_id()] = n;
+    for (Proposition prop : relaxed_task.propositions) {
+        variable_node_ids[prop.id] = graph.add_node(NodeType::OR);
     }
 
-    State initial_state = task_proxy.get_initial_state();
-    this->initial_node_id = this->graph.add_node(NodeType::AND);
+    initial_node_id = graph.add_node(NodeType::AND);
 
-    for (auto fact : relaxed_task.initial_state) {
-        NodeID n = this->id_map[fact];
-        this->graph.add_edge(n, this->initial_node_id);
+    for (PropositionID prop_id : relaxed_task.initial_state) {
+        graph.add_edge(variable_node_ids[prop_id], initial_node_id);
     }
 
-    for (auto op : this->relaxed_task.operators) {
-        NodeID precond_node_id = this->graph.add_node(NodeType::AND);
+    goal_node_id = graph.add_node(NodeType::AND);
 
-        for (auto precond : op.preconditions) {
-            NodeID n = this->id_map[precond];
-            this->graph.add_edge(precond_node_id, n);
+    for (PropositionID id : relaxed_task.goal) {
+        graph.add_edge(goal_node_id, variable_node_ids[id]);
+    }
+
+    NodeID tautology_id = -1;
+
+    for (RelaxedOperator op : relaxed_task.operators) {
+        NodeID op_node_id = graph.add_node(NodeType::AND, op.cost);
+
+        if (op.preconditions.size() == 0) { // Tautology
+            if (tautology_id == -1) {
+                tautology_id = graph.add_node(NodeType::AND);
+            }
+            graph.add_edge(op_node_id, tautology_id);
+        } else {
+            for (PropositionID precond_id : op.preconditions) {
+                graph.add_edge(op_node_id, variable_node_ids[precond_id]);
+            }
         }
 
-        NodeID effect_node_id = this->graph.add_node(NodeType::AND, op.cost);
-
-        this->graph.add_edge(effect_node_id, precond_node_id);
-
-        for (auto effect : op.effects) {
-            NodeID n = this->id_map[effect];
-            this->graph.add_edge(n, effect_node_id);
+        for (PropositionID eff_id : op.effects) {
+            graph.add_edge(variable_node_ids[eff_id], op_node_id);
         }
-    }
-
-    this->goal_node_id = this->graph.add_node(NodeType::AND);
-
-    for (auto fact : relaxed_task.goal) {
-        NodeID n = this->id_map[fact];
-        this->graph.add_edge(this->goal_node_id, n);
     }
 }
 
@@ -78,7 +77,10 @@ bool RelaxedTaskGraph::is_goal_relaxed_reachable() {
     // Compute the most conservative valuation of the graph and use it to
     // return true iff the goal is reachable in the relaxed task.
 
-    return false;
+    graph.most_conservative_valuation();
+    const AndOrGraphNode& goal_node = graph.get_node(goal_node_id);
+
+    return goal_node.forced_true;
 }
 
 int RelaxedTaskGraph::additive_cost_of_goal() {
@@ -87,22 +89,24 @@ int RelaxedTaskGraph::additive_cost_of_goal() {
 
     // TODO: add your code for exercise 2 (c) here.
 
-    this->graph.weighted_most_conservative_valuation();
+    graph.weighted_most_conservative_valuation();
+    const AndOrGraphNode& goal_node = graph.get_node(goal_node_id);
 
-    AndOrGraphNode goal_node = this->graph.get_node(this->goal_node_id);
     return goal_node.additive_cost;
 }
 
 int RelaxedTaskGraph::ff_cost_of_goal() {
     // TODO: add your code for exercise 2 (e) here.
+
+    graph.weighted_most_conservative_valuation();
+
     unordered_set<NodeID> collected;
-
-    AndOrGraphNode goal_node = this->graph.get_node(this->goal_node_id);
-
-    queue<NodeID> node_queue;
     unordered_set<NodeID> visited;
+    queue<NodeID> node_queue;
 
-    visited.emplace(this->goal_node_id);
+    AndOrGraphNode goal_node = graph.get_node(goal_node_id);
+
+    visited.emplace(goal_node_id);
 
     for (auto s : goal_node.successor_ids) {
         node_queue.push(s);

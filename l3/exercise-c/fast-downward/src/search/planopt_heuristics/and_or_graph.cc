@@ -8,8 +8,6 @@
 #include <queue>
 #include <limits> 
 
-using namespace std;
-
 namespace planopt_heuristics {
 
 NodeID AndOrGraph::add_node(NodeType type, int weight) {
@@ -24,7 +22,7 @@ void AndOrGraph::add_edge(NodeID from, NodeID to) {
 }
 
 template<typename T>
-void remove_from_vector(vector<T> &v, const T &elem) {
+void remove_from_vector(std::vector<T> &v, const T &elem) {
     v.erase(remove(v.begin(), v.end(), elem), v.end());
 }
 
@@ -59,13 +57,15 @@ void AndOrGraph::most_conservative_valuation() {
       true if and only if the node is forced true.
     */
 
-    deque<NodeID> queue;
+    std::deque<AndOrGraphNode*> node_queue;
 
-    for (AndOrGraphNode &node : nodes) {
+    for (AndOrGraphNode& node : nodes) {
         node.forced_true = false;
         node.num_forced_successors = 0;
+
         if (node.type == NodeType::AND && node.successor_ids.empty()) {
-            queue.push_back(node.id);
+            node.forced_true = true;
+            node_queue.push_back(&node);
         }
     }
 
@@ -74,24 +74,22 @@ void AndOrGraph::most_conservative_valuation() {
       direct_cost, additive_cost, and achiever for now.
     */
 
-    while (!queue.empty()) {
-        NodeID n = queue.front();
-        queue.pop_front();
+    while (!node_queue.empty()) {
+        AndOrGraphNode* node = node_queue.front();
+        node_queue.pop_front();
 
-        AndOrGraphNode& node = nodes[n];
-        node.forced_true = true;
+        for (NodeID pred_id : node->predecessor_ids) {
+            AndOrGraphNode& pred = nodes[pred_id];
 
-        for (auto& p : node.predecessor_ids) {
-            AndOrGraphNode& pred = nodes[p];
-
-            if (pred.forced_true)
+            if (pred.forced_true) {
                 continue;
+            }
 
             pred.num_forced_successors++;
 
-            if (pred.type == NodeType::OR ||
-                pred.num_forced_successors == (int)pred.successor_ids.size()) {
-                queue.push_back(pred.id);
+            if (pred.type == NodeType::OR || pred.num_forced_successors == (int)pred.successor_ids.size()) {
+                pred.forced_true = true;
+                node_queue.push_back(&pred);
             }
         }
     }
@@ -122,107 +120,101 @@ void AndOrGraph::weighted_most_conservative_valuation() {
     */
 
     /*
-      TODO: add your code for exercise 2 (c) here.
+      Corrected code for exercise 2 (c).
     */
 
-    auto compare = [](AndOrGraphNode* a, AndOrGraphNode* b) { 
-        return (a->direct_cost + a->additive_cost) < (b->direct_cost + b->additive_cost); 
+    // Set forced_true nodes
+    most_conservative_valuation();
+
+    // We sort by the additive_cost (the total path cost)
+    auto compare = [](AndOrGraphNode* a, AndOrGraphNode* b) {
+        return a->additive_cost > b->additive_cost;
     };
 
-    priority_queue<AndOrGraphNode*, vector<AndOrGraphNode*>, decltype(compare)> queue(compare);
+    std::priority_queue<AndOrGraphNode*, std::vector<AndOrGraphNode*>, decltype(compare)> node_queue(compare);
 
-    for (int i = 0; i < nodes.size(); i++) {
-        nodes[i].forced_true = false;
-        nodes[i].num_forced_successors = 0;
-        if (nodes[i].type == NodeType::AND && nodes[i].successor_ids.empty()) {
-            queue.push(&nodes[i]);
-            nodes[i].additive_cost = 0;
+    for (AndOrGraphNode& node : nodes) {
+        if (node.type == NodeType::AND && node.successor_ids.empty()) {
+            node.additive_cost = node.direct_cost;
+            node_queue.push(&node);
         } else {
-            nodes[i].additive_cost = INT32_MAX;
+            node.additive_cost = INT32_MAX;
         }
     }
 
-    while (!queue.empty()) {
-        AndOrGraphNode* node = queue.top();
-        queue.pop();
+    while (!node_queue.empty()) {
+        AndOrGraphNode* node = node_queue.top();
+        node_queue.pop();
 
-        if (node->type == NodeType::OR) {
-            for (auto s : node->successor_ids) {
-                AndOrGraphNode& succ = nodes[s];
-                if (succ.direct_cost + succ.additive_cost < node->additive_cost) {
-                    node->additive_cost = succ.direct_cost + succ.additive_cost;
-                    node->achiever = succ.id;
+        for (auto pred_id : node->predecessor_ids) {
+            AndOrGraphNode& pred = nodes[pred_id];
+
+            if (pred.type == NodeType::OR) {
+                int new_cost = pred.direct_cost + node->additive_cost;
+
+                if (new_cost < pred.additive_cost) {
+                    pred.additive_cost = new_cost;
+                    pred.achiever = node->id;
+                    node_queue.push(&pred);
                 }
-            }
-        } else {
-            // Since we are computing h-add, we will be summing up the costs
-            // of the successors.
-            // If we were computing h-max, we would be taking the maximum value
-            // from the costs of the successors.
-            int new_cost = 0;
-            for (auto s : node->successor_ids) {
-                AndOrGraphNode& succ = nodes[s];
-                new_cost += succ.direct_cost + succ.additive_cost;
-            }
-            node->additive_cost = node->direct_cost + new_cost;
-        }
 
-        node->forced_true = true;
+            } else {
+                pred.num_forced_successors++;
 
-        for (auto p : node->predecessor_ids) {
-            AndOrGraphNode& pred = nodes[p];
+                if (pred.num_forced_successors == (int)pred.successor_ids.size()) {
+                    int new_cost = pred.direct_cost;
+                    for (auto s : pred.successor_ids) {
+                        new_cost += nodes[s].additive_cost;
+                    }
 
-            if (pred.forced_true)
-                continue;
-
-            pred.num_forced_successors++;
-
-            if (pred.type == NodeType::OR ||
-                pred.num_forced_successors == (int)pred.successor_ids.size()) {
-                queue.push(&nodes[p]);
+                    if (new_cost < pred.additive_cost) {
+                        pred.additive_cost = new_cost;
+                        node_queue.push(&pred);
+                    }
+                }
             }
         }
     }
 }
 
-void add_nodes(vector<string> names, NodeType type, AndOrGraph &g, unordered_map<string, NodeID> &ids) {
-    for (string name : names) {
+void add_nodes(std::vector<std::string> names, NodeType type, AndOrGraph &g, std::unordered_map<std::string, NodeID> &ids) {
+    for (std::string name : names) {
         ids[name] = g.add_node(type);
     }
 }
 
-void add_edges(vector<pair<string, string>> edges, AndOrGraph &g, unordered_map<string, NodeID> &ids) {
+void add_edges(std::vector<std::pair<std::string, std::string>> edges, AndOrGraph &g, std::unordered_map<std::string, NodeID> &ids) {
     for (const auto &edge : edges) {
         g.add_edge(ids[edge.first], ids[edge.second]);
     }
 }
 
-void test_most_conservative_valuation(const unordered_set<string> &forced_true,
-    const string &graph_name, AndOrGraph &g, unordered_map<string, NodeID> &ids) {
-    cout << endl << "Verifying graph " << graph_name << endl;
+void test_most_conservative_valuation(const std::unordered_set<std::string> &forced_true,
+    const std::string &graph_name, AndOrGraph &g, std::unordered_map<std::string, NodeID> &ids) {
+    std::cout << std::endl << "Verifying graph " << graph_name << std::endl;
     bool success = true;
     g.most_conservative_valuation();
 
     for (const auto &node : ids) {
-        string name = node.first;
+        std::string name = node.first;
         NodeID id = node.second;
         bool is_set = g.get_node(id).forced_true;
         bool should_be_set = forced_true.find(name) != forced_true.end();
         if (is_set && !should_be_set) {
-            cout << "The algorithm marked node " << name
-                 << " as forced true but shouldn't have" << endl;
+            std::cout << "The algorithm marked node " << name
+                 << " as forced true but shouldn't have" << std::endl;
             success = false;
         } else if (!is_set && should_be_set) {
-            cout << "The algorithm should have marked node " << name
-                 << " as forced true but didn't" << endl;
+            std::cout << "The algorithm should have marked node " << name
+                 << " as forced true but didn't" << std::endl;
             success = false;
         }
     }
 
     if (success) {
-        cout << "Verification of " << graph_name << " successful" << endl;
+        std::cout << "Verification of " << graph_name << " successful" << std::endl;
     } else {
-        cout << "Verification of " << graph_name << " failed" << endl;
+        std::cout << "Verification of " << graph_name << " failed" << std::endl;
     }
 }
 
@@ -244,7 +236,7 @@ void test_and_or_graphs() {
       Nodes A2, A3, O2 are forced true.
     */
     AndOrGraph g1;
-    unordered_map<string, NodeID> ids1;
+    std::unordered_map<std::string, NodeID> ids1;
     add_nodes({"O1", "O2", "O3", "O4", "O5"}, NodeType::OR, g1, ids1);
     add_nodes({"A1", "A2", "A3", "A4"}, NodeType::AND, g1, ids1);
     add_edges({
@@ -285,7 +277,7 @@ void test_and_or_graphs() {
       All nodes are forced true.
     */
     AndOrGraph g2;
-    unordered_map<string, NodeID> ids2;
+    std::unordered_map<std::string, NodeID> ids2;
     // Variable nodes
     add_nodes({"Oa", "Ob", "Oc", "Od", "Oe", "Of", "Og", "Oh"}, NodeType::OR, g2, ids2);
     // Effect nodes
@@ -355,7 +347,7 @@ void test_and_or_graphs() {
       All nodes except Od, Oe, Acd, Aop1e1, and AG are forced true.
     */
     AndOrGraph g3;
-    unordered_map<string, NodeID> ids3;
+    std::unordered_map<std::string, NodeID> ids3;
     // Variable nodes
     add_nodes({"Oa", "Ob", "Oc", "Od", "Oe", "Of", "Og", "Oh"}, NodeType::OR, g3, ids3);
     // Effect nodes

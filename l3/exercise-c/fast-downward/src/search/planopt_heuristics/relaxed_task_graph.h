@@ -1,8 +1,5 @@
 #ifndef PLANOPT_HEURISTICS_RELAXED_TASK_GRAPH_H
 #define PLANOPT_HEURISTICS_RELAXED_TASK_GRAPH_H
-
-#include <unordered_map>
-
 #include "../heuristic.h"
 #include "and_or_graph.h"
 #include "relaxed_task.h"
@@ -15,7 +12,6 @@ class RelaxedTaskGraph {
     AndOrGraph graph;
     NodeID initial_node_id;
     NodeID goal_node_id;
-    std::unordered_map<int, NodeID> id_map;
 public:
     RelaxedTaskGraph(const TaskProxy &task_proxy);
 
