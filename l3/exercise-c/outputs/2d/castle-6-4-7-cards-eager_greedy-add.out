@@ -1,0 +1,197 @@
+INFO     planner time limit: None
+INFO     planner memory limit: None
+
+INFO     Running translator.
+INFO     translator stdin: None
+INFO     translator time limit: None
+INFO     translator memory limit: None
+INFO     translator command line string: /usr/bin/python3 /home/gabriel/Documents/UFRGS/2025-2/IAA-L3/fast-downward/builds/release/bin/translate/translate.py castle/domain.pddl castle/castle-6-4-7-cards.pddl --sas-file output.sas
+Parsing...
+Parsing: [0.000s CPU, 0.002s wall-clock]
+Normalizing task... [0.000s CPU, 0.000s wall-clock]
+Instantiating...
+Generating Datalog program... [0.000s CPU, 0.000s wall-clock]
+Normalizing Datalog program...
+Normalizing Datalog program: [0.000s CPU, 0.001s wall-clock]
+Preparing model... [0.000s CPU, 0.001s wall-clock]
+Generated 20 rules.
+Computing model... [0.020s CPU, 0.011s wall-clock]
+2107 relevant atoms
+902 auxiliary atoms
+3009 final queue length
+5991 total queue pushes
+Completing instantiation... [0.020s CPU, 0.028s wall-clock]
+Instantiating: [0.040s CPU, 0.041s wall-clock]
+Computing fact groups...
+Finding invariants...
+7 initial candidates
+Finding invariants: [0.000s CPU, 0.001s wall-clock]
+Checking invariant weight... [0.000s CPU, 0.000s wall-clock]
+Instantiating groups... [0.000s CPU, 0.001s wall-clock]
+Collecting mutex groups... [0.000s CPU, 0.000s wall-clock]
+Choosing groups...
+24 uncovered facts
+Choosing groups: [0.000s CPU, 0.000s wall-clock]
+Building translation key... [0.000s CPU, 0.000s wall-clock]
+Computing fact groups: [0.010s CPU, 0.003s wall-clock]
+Building STRIPS to SAS dictionary... [0.000s CPU, 0.000s wall-clock]
+Building dictionary for full mutex groups... [0.000s CPU, 0.000s wall-clock]
+Building mutex information...
+Building mutex information: [0.000s CPU, 0.000s wall-clock]
+Translating task...
+Processing axioms...
+Simplifying axioms... [0.000s CPU, 0.000s wall-clock]
+Translator axioms removed by simplifying: 0
+Processing axioms: [0.000s CPU, 0.002s wall-clock]
+Translating task: [0.030s CPU, 0.033s wall-clock]
+0 effect conditions simplified
+0 implied preconditions added
+Detecting unreachable propositions...
+0 operators removed
+0 axioms removed
+36 propositions removed
+Detecting unreachable propositions: [0.020s CPU, 0.017s wall-clock]
+Reordering and filtering variables...
+48 of 48 variables necessary.
+20 of 48 mutex groups necessary.
+1337 of 1337 operators necessary.
+0 of 0 axiom rules necessary.
+Reordering and filtering variables: [0.000s CPU, 0.006s wall-clock]
+Translator variables: 48
+Translator derived variables: 0
+Translator facts: 245
+Translator goal facts: 20
+Translator mutex groups: 20
+Translator total mutex groups size: 177
+Translator operators: 1337
+Translator axioms: 0
+Translator task size: 10680
+Translator peak memory: 41592 KB
+Writing output... [0.010s CPU, 0.006s wall-clock]
+Done! [0.120s CPU, 0.111s wall-clock]
+translate exit code: 0
+
+INFO     Running search (release).
+INFO     search stdin: output.sas
+INFO     search time limit: None
+INFO     search memory limit: None
+INFO     search command line string: /home/gabriel/Documents/UFRGS/2025-2/IAA-L3/fast-downward/builds/release/bin/downward --search 'eager_greedy([add()])' --internal-plan-file sas_plan < output.sas
+[t=0.000000s, 10048 KB] reading input...
+[t=0.003999s, 10416 KB] done reading input!
+[t=0.005000s, 10948 KB] Simplifying 2831 unary operators... done! [2831 unary operators]
+[t=0.006999s, 11080 KB] time to simplify: 0.001999s
+[t=0.007999s, 11080 KB] Initializing additive heuristic...
+[t=0.007999s, 11080 KB] Building successor generator...done!
+[t=0.007999s, 11080 KB] peak memory difference for successor generator creation: 0 KB
+[t=0.007999s, 11080 KB] time for successor generation creation: 0.000000s
+[t=0.007999s, 11080 KB] Variables: 48
+[t=0.007999s, 11080 KB] FactPairs: 245
+[t=0.007999s, 11080 KB] Bytes per state: 16
+[t=0.007999s, 11080 KB] Conducting best first search without reopening closed nodes, (real) bound = 2147483647
+[t=0.007999s, 11080 KB] New best heuristic value for add: 555
+[t=0.007999s, 11080 KB] g=0, 1 evaluated, 0 expanded
+[t=0.007999s, 11080 KB] Initial heuristic value for add: 555
+[t=0.007999s, 11080 KB] pruning method: none
+[t=0.007999s, 11080 KB] New best heuristic value for add: 480
+[t=0.007999s, 11080 KB] g=1, 2 evaluated, 1 expanded
+[t=0.009009s, 11080 KB] New best heuristic value for add: 414
+[t=0.009009s, 11080 KB] g=2, 7 evaluated, 2 expanded
+[t=0.009009s, 11080 KB] New best heuristic value for add: 412
+[t=0.009009s, 11080 KB] g=2, 12 evaluated, 2 expanded
+[t=0.009009s, 11080 KB] New best heuristic value for add: 343
+[t=0.009009s, 11080 KB] g=3, 13 evaluated, 3 expanded
+[t=0.009009s, 11080 KB] New best heuristic value for add: 288
+[t=0.009009s, 11080 KB] g=4, 17 evaluated, 4 expanded
+[t=0.009009s, 11080 KB] New best heuristic value for add: 280
+[t=0.009009s, 11080 KB] g=5, 20 evaluated, 5 expanded
+[t=0.009009s, 11080 KB] New best heuristic value for add: 237
+[t=0.009009s, 11080 KB] g=6, 22 evaluated, 6 expanded
+[t=0.009009s, 11080 KB] New best heuristic value for add: 185
+[t=0.009009s, 11080 KB] g=7, 27 evaluated, 7 expanded
+[t=0.009009s, 11080 KB] New best heuristic value for add: 151
+[t=0.009009s, 11080 KB] g=8, 34 evaluated, 8 expanded
+[t=0.009974s, 11080 KB] New best heuristic value for add: 145
+[t=0.009974s, 11080 KB] g=9, 36 evaluated, 9 expanded
+[t=0.009974s, 11080 KB] New best heuristic value for add: 117
+[t=0.009974s, 11080 KB] g=10, 66 evaluated, 25 expanded
+[t=0.009974s, 11080 KB] New best heuristic value for add: 110
+[t=0.009974s, 11080 KB] g=11, 69 evaluated, 26 expanded
+[t=0.009974s, 11080 KB] New best heuristic value for add: 104
+[t=0.009974s, 11080 KB] g=12, 75 evaluated, 27 expanded
+[t=0.009974s, 11080 KB] New best heuristic value for add: 99
+[t=0.009974s, 11080 KB] g=12, 77 evaluated, 27 expanded
+[t=0.010973s, 11080 KB] New best heuristic value for add: 97
+[t=0.010973s, 11080 KB] g=13, 84 evaluated, 28 expanded
+[t=0.010973s, 11080 KB] New best heuristic value for add: 78
+[t=0.010973s, 11080 KB] g=14, 86 evaluated, 29 expanded
+[t=0.010973s, 11080 KB] New best heuristic value for add: 72
+[t=0.010973s, 11080 KB] g=15, 91 evaluated, 30 expanded
+[t=0.010973s, 11080 KB] New best heuristic value for add: 58
+[t=0.010973s, 11080 KB] g=16, 95 evaluated, 31 expanded
+[t=0.010973s, 11080 KB] New best heuristic value for add: 46
+[t=0.010973s, 11080 KB] g=17, 99 evaluated, 32 expanded
+[t=0.010973s, 11080 KB] New best heuristic value for add: 32
+[t=0.010973s, 11080 KB] g=19, 109 evaluated, 35 expanded
+[t=0.010973s, 11080 KB] New best heuristic value for add: 28
+[t=0.010973s, 11080 KB] g=20, 112 evaluated, 36 expanded
+[t=0.010973s, 11080 KB] New best heuristic value for add: 17
+[t=0.010973s, 11080 KB] g=21, 117 evaluated, 37 expanded
+[t=0.010973s, 11080 KB] New best heuristic value for add: 13
+[t=0.010973s, 11080 KB] g=22, 122 evaluated, 38 expanded
+[t=0.010973s, 11080 KB] New best heuristic value for add: 10
+[t=0.010973s, 11080 KB] g=22, 125 evaluated, 38 expanded
+[t=0.010973s, 11080 KB] New best heuristic value for add: 5
+[t=0.010973s, 11080 KB] g=23, 130 evaluated, 39 expanded
+[t=0.011973s, 11080 KB] New best heuristic value for add: 2
+[t=0.011973s, 11080 KB] g=24, 136 evaluated, 40 expanded
+[t=0.011973s, 11080 KB] New best heuristic value for add: 1
+[t=0.011973s, 11080 KB] g=25, 139 evaluated, 41 expanded
+[t=0.011973s, 11080 KB] New best heuristic value for add: 0
+[t=0.011973s, 11080 KB] g=26, 145 evaluated, 42 expanded
+[t=0.011973s, 11080 KB] Solution found!
+[t=0.011973s, 11080 KB] Actual search time: 0.003974s
+discard spade2 heart2 spadea (1)
+move club3 club5 club4 (1)
+discard heart2 club6 hearta (1)
+discard spade3 heart4 spade2 (1)
+move club5 spade4 club6 (1)
+discard spade4 diamond2 spade3 (1)
+discard diamond2 diamond4 diamonda (1)
+move heart4 diamond3 club5 (1)
+discard diamond3 heart3 diamond2 (1)
+discard diamond4 pile0 diamond3 (1)
+discard heart3 spade5 heart2 (1)
+discard heart4 club5 heart3 (1)
+discard spade5 pile3 spade4 (1)
+move club3 club4 pile0 (1)
+move club4 spade6 club5 (1)
+discard spade6 heart5 spade5 (1)
+discard heart5 diamond6 heart4 (1)
+move diamond6 club2 pile3 (1)
+discard club2 pile1 cluba (1)
+discard club3 pile0 club2 (1)
+discard club4 club5 club3 (1)
+discard club5 club6 club4 (1)
+discard club6 diamond5 club5 (1)
+discard diamond5 heart6 diamond4 (1)
+discard diamond6 pile3 diamond5 (1)
+discard heart6 pile2 heart5 (1)
+[t=0.011973s, 11080 KB] Plan length: 26 step(s).
+[t=0.011973s, 11080 KB] Plan cost: 26
+[t=0.011973s, 11080 KB] Expanded 43 state(s).
+[t=0.011973s, 11080 KB] Reopened 0 state(s).
+[t=0.011973s, 11080 KB] Evaluated 148 state(s).
+[t=0.011973s, 11080 KB] Evaluations: 148
+[t=0.011973s, 11080 KB] Generated 189 state(s).
+[t=0.011973s, 11080 KB] Dead ends: 8 state(s).
+[t=0.011973s, 11080 KB] Number of registered states: 148
+[t=0.011973s, 11080 KB] Int hash set load factor: 148/256 = 0.578125
+[t=0.011973s, 11080 KB] Int hash set resizes: 8
+[t=0.011973s, 11080 KB] Search time: 0.003974s
+[t=0.011973s, 11080 KB] Total time: 0.011973s
+Solution found.
+Peak memory: 11080 KB
+Remove intermediate file output.sas
+search exit code: 0
+
+INFO     Planner time: 0.18s
