@@ -1,0 +1,5 @@
+O número de estados expandidos utilizando a heuristica planopt_pdb(pattern=P) foi o mesmo que o observado utilizando a implementação built-in (CPDBS), para todas as instâncias analizadas.
+O número de estados estados expandido pelas heurísticas planopt_pdb(pattern=P) e pela implementação built-in (CPDBS) foi, para a maioria das instâncias, significativamente menor que o observado pelo PDB built-in (sendo que este, em alguns casos, não foi capaz de gerar nenhum resultado dentro das restrições de tempo e memória definidas).
+Nenhuma das heurísticas analisadas foi capaz de resolver a instância 7.
+
+Quanto ao tempo de busca e pré-processamento: a implementação customizada planopt_pdb(pattern=P) obteve tempos bastante similares aos observados nas execuções da implementação built-in (CPDBS) para todas as instâncias (sendo ligeiramente mais demorada). Os tempos de busca e pré-processamento do PDB built-in foram bem maiores em média.
