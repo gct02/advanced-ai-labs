@@ -1,0 +1,18 @@
+Implementation: Built-in
+  expanded: Mean = 625145.3333333334, Std = 1214692.4735473401
+  search_time: Mean = 2.505795, Std = 4.950747305143201
+  total_time: Mean = 2.5131215, Std = 4.9553637885235275
+  Successful runs: 6
+
+Implementation: Built-in PDB
+  expanded: Mean = 855986.0, Std = 1204494.9613139387
+  search_time: Mean = 3.3394894999999996, Std = 5.539326839333903
+  total_time: Mean = 3.346489333333333, Std = 5.543621244469348
+  Successful runs: 4
+
+Implementation: PlanOpt
+  expanded: Mean = 625145.3333333334, Std = 1214692.4735473401
+  search_time: Mean = 2.8651846666666665, Std = 5.678529939100221
+  total_time: Mean = 2.872185, Std = 5.682804140838277
+  Successful runs: 6
+

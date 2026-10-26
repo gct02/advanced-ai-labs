@@ -1,0 +1,96 @@
+diff --git a/driver/arguments.py b/driver/arguments.py
+--- a/driver/arguments.py
++++ b/driver/arguments.py
+@@ -234,6 +234,8 @@
+         args.components.append("translate")
+     if args.search or args.run_all:
+         args.components.append("search")
++    if args.test_and_or_graphs or args.test_projections:
++        args.components = ["search"]
+ 
+     if not args.components:
+         _set_components_automatically(parser, args)
+@@ -260,6 +262,12 @@
+     elif first == "search":
+         if "--help" in args.search_options:
+             args.search_input = None
++        elif args.test_and_or_graphs:
++            args.search_input = None
++            args.search_options = ["--test-and-or-graphs"]
++        elif args.test_projections:
++            args.search_input = None
++            args.search_options = ["--test-projections"]
+         elif len(args.filenames) == 1:
+             args.search_input = Path(args.filenames[0])
+         else:
+@@ -370,6 +378,13 @@
+         "--show-aliases", action="store_true",
+         help="show the known aliases (see --alias) and exit")
+ 
++    help_options.add_argument(
++        "--test-and-or-graphs", action="store_true",
++        help="run test on the implementation of AND/OR graphs and exit")
++    help_options.add_argument(
++        "--test-projections", action="store_true",
++        help="run test on the implementation of projections and exit")
++
+     components = parser.add_argument_group(
+         title=("driver options selecting the planner components to be run\n"
+                "(may select several; default: auto-select based on input file(s))"))
+diff --git a/src/search/CMakeLists.txt b/src/search/CMakeLists.txt
+--- a/src/search/CMakeLists.txt
++++ b/src/search/CMakeLists.txt
+@@ -958,3 +958,24 @@
+         algorithms/sccs
+     DEPENDENCY_ONLY
+ )
++
++create_fast_downward_library(
++    NAME planopt_heuristics
++    HELP "Heuristics implemented in the Planning and Optimization exercises"
++    SOURCES
++        # Lab 3: delete relaxation
++        planopt_heuristics/and_or_graph
++        planopt_heuristics/relaxed_task
++        planopt_heuristics/relaxed_task_graph
++        planopt_heuristics/h_relaxed_task_graph
++        planopt_heuristics/h_add
++        planopt_heuristics/h_ff
++        # Lab 4: abstraction heuristics
++        planopt_heuristics/tnf_task
++        planopt_heuristics/projection
++        planopt_heuristics/projection_test
++        planopt_heuristics/pdb
++        planopt_heuristics/h_pdb
++        planopt_heuristics/canonical_pdbs
++        planopt_heuristics/h_canonical_pdbs
++)
+diff --git a/src/search/planner.cc b/src/search/planner.cc
+--- a/src/search/planner.cc
++++ b/src/search/planner.cc
+@@ -7,6 +7,9 @@
+ #include "utils/system.h"
+ #include "utils/timer.h"
+ 
++#include "planopt_heuristics/and_or_graph.h"
++#include "planopt_heuristics/projection_test.h"
++
+ #include <iostream>
+ 
+ using namespace std;
+@@ -21,6 +24,15 @@
+             utils::exit_with(ExitCode::SEARCH_INPUT_ERROR);
+         }
+ 
++        if (static_cast<string>(argv[1]) == "--test-and-or-graphs") {
++            planopt_heuristics::test_and_or_graphs();
++            exit(0);
++        }
++        if (static_cast<string>(argv[1]) == "--test-projections") {
++            planopt_heuristics::test_projections();
++            exit(0);
++        }
++
+         bool unit_cost = false;
+         if (static_cast<string>(argv[1]) != "--help") {
+             utils::g_log << "reading input..." << endl;

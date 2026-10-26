@@ -1,5 +1,0 @@
-O número de estados expandidos utilizando a heuristica planopt_pdb(pattern=P) foi o mesmo que o observado utilizando a implementação built-in, para todas as instâncias analizadas, e considerando tanto a pattern com no máximo 1000 estados quanto a com no máximo 100000 estados.
-
-Considerando o máximo de 1000 estados, os tempos de busca e pré-processamento da heuristica customizada planopt_pdb(pattern=P) (média de ~5.7357s para busca e ~0.0167s para pré-processamento) foram ligeiramente maiores que os da implementação built-in (média de ~5.6498s para busca e ~0.0106s para pré-processament, embora muito similares.
-
-Considerando 100000 estados, o tempo de busca da heuristica customizada planopt_pdb(pattern=P) foi, também, ligeiramente maior que o da implementação built-in (~1.6255s versus ~1.5882), mas o tempo de pré-processamento foi razoavelmente maior (~1.3770 versus ~0.0312).

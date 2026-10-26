@@ -1,0 +1,351 @@
+Instance 1 with k=1000
+Extracted PATTERN: [56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=3.535239s, 90100 KB] Expanded until last jump: 943826 state(s).
+[t=3.535239s, 90100 KB] Search time: 3.526239s
+[t=3.535239s, 90100 KB] Total time: 3.535239s
+PlanOpt implementation
+[t=3.528553s, 90316 KB] Expanded until last jump: 943826 state(s).
+[t=3.528553s, 90316 KB] Search time: 3.507553s
+[t=3.528553s, 90316 KB] Total time: 3.528553s
+
+Instance 2 with k=1000
+Extracted PATTERN: [56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=22.111395s, 472248 KB] Expanded until last jump: 6173897 state(s).
+[t=22.111395s, 472248 KB] Search time: 22.095403s
+[t=22.111395s, 472248 KB] Total time: 22.111395s
+PlanOpt implementation
+[t=20.747233s, 472368 KB] Expanded until last jump: 6173897 state(s).
+[t=20.747233s, 472368 KB] Search time: 20.730233s
+[t=20.747233s, 472368 KB] Total time: 20.747233s
+
+Instance 3 with k=1000
+Extracted PATTERN: [56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=7.423521s, 172732 KB] Expanded until last jump: 2284135 state(s).
+[t=7.423521s, 172732 KB] Search time: 7.408575s
+[t=7.423521s, 172732 KB] Total time: 7.423521s
+PlanOpt implementation
+[t=8.401711s, 172880 KB] Expanded until last jump: 2284135 state(s).
+[t=8.401711s, 172880 KB] Search time: 8.386709s
+[t=8.401711s, 172880 KB] Total time: 8.401711s
+
+Instance 4 with k=1000
+Extracted PATTERN: [56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=0.017000s, 11812 KB] Expanded until last jump: 3718 state(s).
+[t=0.017000s, 11812 KB] Search time: 0.006999s
+[t=0.017000s, 11812 KB] Total time: 0.017000s
+PlanOpt implementation
+[t=0.022000s, 11928 KB] Expanded until last jump: 3718 state(s).
+[t=0.022000s, 11928 KB] Search time: 0.008001s
+[t=0.022000s, 11928 KB] Total time: 0.022000s
+
+Instance 5 with k=1000
+Extracted PATTERN: [57, 58, 59, 60, 61, 62, 63, 64, 65]
+Built-in implementation
+[t=6.150794s, 155352 KB] Expanded until last jump: 2083481 state(s).
+[t=6.150794s, 155352 KB] Search time: 6.140794s
+[t=6.150794s, 155352 KB] Total time: 6.150794s
+PlanOpt implementation
+[t=6.781067s, 155424 KB] Expanded until last jump: 2083481 state(s).
+[t=6.781067s, 155424 KB] Search time: 6.763066s
+[t=6.781067s, 155424 KB] Total time: 6.781067s
+
+Instance 7 with k=1000
+Extracted PATTERN: [56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=4.813255s, 132780 KB] Expanded until last jump: 1212763 state(s).
+[t=4.813255s, 132780 KB] Search time: 4.803256s
+[t=4.813255s, 132780 KB] Total time: 4.813255s
+PlanOpt implementation
+[t=4.325512s, 132856 KB] Expanded until last jump: 1212763 state(s).
+[t=4.325512s, 132856 KB] Search time: 4.309513s
+[t=4.325512s, 132856 KB] Total time: 4.325512s
+
+Instance 8 with k=1000
+Extracted PATTERN: [56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=6.281594s, 154408 KB] Expanded until last jump: 2191432 state(s).
+[t=6.281594s, 154408 KB] Search time: 6.271594s
+[t=6.281594s, 154408 KB] Total time: 6.281594s
+PlanOpt implementation
+[t=6.775494s, 154592 KB] Expanded until last jump: 2191432 state(s).
+[t=6.775494s, 154592 KB] Search time: 6.759497s
+[t=6.775494s, 154592 KB] Total time: 6.775494s
+
+Instance 9 with k=1000
+Extracted PATTERN: [56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=2.254332s, 72208 KB] Expanded until last jump: 591954 state(s).
+[t=2.254332s, 72208 KB] Search time: 2.244332s
+[t=2.254332s, 72208 KB] Total time: 2.254332s
+PlanOpt implementation
+[t=2.325783s, 72320 KB] Expanded until last jump: 591954 state(s).
+[t=2.325783s, 72320 KB] Search time: 2.308783s
+[t=2.325783s, 72320 KB] Total time: 2.325783s
+
+Instance 10 with k=1000
+Extracted PATTERN: [57, 58, 59, 60, 61, 62, 63, 64, 65]
+Built-in implementation
+[t=0.012000s, 11604 KB] Expanded until last jump: 744 state(s).
+[t=0.012000s, 11604 KB] Search time: 0.002000s
+[t=0.012000s, 11604 KB] Total time: 0.012000s
+PlanOpt implementation
+[t=0.017999s, 11952 KB] Expanded until last jump: 744 state(s).
+[t=0.017999s, 11952 KB] Search time: 0.001999s
+[t=0.017999s, 11952 KB] Total time: 0.017999s
+
+Instance 11 with k=1000
+Extracted PATTERN: [56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=4.992729s, 133516 KB] Expanded until last jump: 1377703 state(s).
+[t=4.992729s, 133516 KB] Search time: 4.982730s
+[t=4.992729s, 133516 KB] Total time: 4.992729s
+PlanOpt implementation
+[t=5.203356s, 133624 KB] Expanded until last jump: 1377703 state(s).
+[t=5.203356s, 133624 KB] Search time: 5.187355s
+[t=5.203356s, 133624 KB] Total time: 5.203356s
+
+Instance 13 with k=1000
+Extracted PATTERN: [56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=0.025000s, 11872 KB] Expanded until last jump: 6742 state(s).
+[t=0.025000s, 11872 KB] Search time: 0.014999s
+[t=0.025000s, 11872 KB] Total time: 0.025000s
+PlanOpt implementation
+[t=0.030000s, 12040 KB] Expanded until last jump: 6742 state(s).
+[t=0.030000s, 12040 KB] Search time: 0.014999s
+[t=0.030000s, 12040 KB] Total time: 0.030000s
+
+Instance 14 with k=1000
+Extracted PATTERN: [57, 58, 59, 60, 61, 62, 63, 64, 65]
+Built-in implementation
+[t=0.063977s, 12660 KB] Expanded until last jump: 20956 state(s).
+[t=0.063977s, 12660 KB] Search time: 0.054000s
+[t=0.063977s, 12660 KB] Total time: 0.063977s
+PlanOpt implementation
+[t=0.077986s, 12764 KB] Expanded until last jump: 20956 state(s).
+[t=0.077986s, 12764 KB] Search time: 0.059993s
+[t=0.077986s, 12764 KB] Total time: 0.077986s
+
+Instance 16 with k=1000
+Extracted PATTERN: [56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=11.886471s, 267036 KB] Expanded until last jump: 3182046 state(s).
+[t=11.886471s, 267036 KB] Search time: 11.876471s
+[t=11.886471s, 267036 KB] Total time: 11.886471s
+PlanOpt implementation
+[t=12.891551s, 267200 KB] Expanded until last jump: 3182046 state(s).
+[t=12.891551s, 267200 KB] Search time: 12.874563s
+[t=12.891551s, 267200 KB] Total time: 12.891551s
+
+Instance 17 with k=1000
+Extracted PATTERN: [56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=20.927287s, 476096 KB] Expanded until last jump: 5635414 state(s).
+[t=20.927287s, 476096 KB] Search time: 20.917287s
+[t=20.927287s, 476096 KB] Total time: 20.927287s
+PlanOpt implementation
+[t=20.826441s, 476288 KB] Expanded until last jump: 5635414 state(s).
+[t=20.826441s, 476288 KB] Search time: 20.811441s
+[t=20.826441s, 476288 KB] Total time: 20.826441s
+
+Instance 18 with k=1000
+Extracted PATTERN: [56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=0.060987s, 12804 KB] Expanded until last jump: 23009 state(s).
+[t=0.060987s, 12804 KB] Search time: 0.050988s
+[t=0.060987s, 12804 KB] Total time: 0.060987s
+PlanOpt implementation
+[t=0.063993s, 12876 KB] Expanded until last jump: 23009 state(s).
+[t=0.063993s, 12876 KB] Search time: 0.047993s
+[t=0.063993s, 12876 KB] Total time: 0.063993s
+
+Instance 20 with k=1000
+Extracted PATTERN: [57, 58, 59, 60, 61, 62, 63, 64, 65]
+Built-in implementation
+[t=0.010980s, 11608 KB] Expanded until last jump: 106 state(s).
+[t=0.010980s, 11608 KB] Search time: 0.001000s
+[t=0.010980s, 11608 KB] Total time: 0.010980s
+PlanOpt implementation
+[t=0.021000s, 11936 KB] Expanded until last jump: 106 state(s).
+[t=0.021000s, 11936 KB] Search time: 0.000000s
+[t=0.021000s, 11936 KB] Total time: 0.021000s
+
+Instance 1 with k=100000
+Extracted PATTERN: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=0.659287s, 27364 KB] Expanded until last jump: 163463 state(s).
+[t=0.659287s, 27364 KB] Search time: 0.627363s
+[t=0.659287s, 27364 KB] Total time: 0.659287s
+PlanOpt implementation
+[t=1.996786s, 27528 KB] Expanded until last jump: 163463 state(s).
+[t=1.996786s, 27528 KB] Search time: 0.645896s
+[t=1.996786s, 27528 KB] Total time: 1.996786s
+
+Instance 2 with k=100000
+Extracted PATTERN: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=6.583748s, 153032 KB] Expanded until last jump: 2077437 state(s).
+[t=6.583748s, 153032 KB] Search time: 6.552747s
+[t=6.583748s, 153032 KB] Total time: 6.583748s
+PlanOpt implementation
+[t=8.050396s, 153244 KB] Expanded until last jump: 2077437 state(s).
+[t=8.050396s, 153244 KB] Search time: 6.654423s
+[t=8.050396s, 153244 KB] Total time: 8.050396s
+
+Instance 3 with k=100000
+Extracted PATTERN: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=2.414294s, 71408 KB] Expanded until last jump: 691046 state(s).
+[t=2.414294s, 71408 KB] Search time: 2.384294s
+[t=2.414294s, 71408 KB] Total time: 2.414294s
+PlanOpt implementation
+[t=3.683454s, 71556 KB] Expanded until last jump: 691046 state(s).
+[t=3.683454s, 71556 KB] Search time: 2.310104s
+[t=3.683454s, 71556 KB] Total time: 3.683454s
+
+Instance 4 with k=100000
+Extracted PATTERN: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=0.036000s, 11996 KB] Expanded until last jump: 3718 state(s).
+[t=0.036000s, 11996 KB] Search time: 0.008001s
+[t=0.036000s, 11996 KB] Total time: 0.036000s
+PlanOpt implementation
+[t=1.352902s, 12440 KB] Expanded until last jump: 3718 state(s).
+[t=1.352902s, 12440 KB] Search time: 0.009000s
+[t=1.352902s, 12440 KB] Total time: 1.352902s
+
+Instance 5 with k=100000
+Extracted PATTERN: [50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65]
+Built-in implementation
+[t=3.636490s, 84840 KB] Expanded until last jump: 1085453 state(s).
+[t=3.636490s, 84840 KB] Search time: 3.601490s
+[t=3.636490s, 84840 KB] Total time: 3.636490s
+PlanOpt implementation
+[t=5.108234s, 85028 KB] Expanded until last jump: 1085453 state(s).
+[t=5.108234s, 85028 KB] Search time: 3.725492s
+[t=5.108234s, 85028 KB] Total time: 5.108234s
+
+Instance 7 with k=100000
+Extracted PATTERN: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=1.380412s, 44684 KB] Expanded until last jump: 349735 state(s).
+[t=1.380412s, 44684 KB] Search time: 1.350412s
+[t=1.380412s, 44684 KB] Total time: 1.380412s
+PlanOpt implementation
+[t=2.401958s, 44876 KB] Expanded until last jump: 349735 state(s).
+[t=2.401958s, 44876 KB] Search time: 1.212978s
+[t=2.401958s, 44876 KB] Total time: 2.401958s
+
+Instance 8 with k=100000
+Extracted PATTERN: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=3.254924s, 83396 KB] Expanded until last jump: 1158937 state(s).
+[t=3.254924s, 83396 KB] Search time: 3.223928s
+[t=3.254924s, 83396 KB] Total time: 3.254924s
+PlanOpt implementation
+[t=4.650677s, 83616 KB] Expanded until last jump: 1158937 state(s).
+[t=4.650677s, 83616 KB] Search time: 3.167738s
+[t=4.650677s, 83616 KB] Total time: 4.650677s
+
+Instance 9 with k=100000
+Extracted PATTERN: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=0.531989s, 27060 KB] Expanded until last jump: 138527 state(s).
+[t=0.531989s, 27060 KB] Search time: 0.501989s
+[t=0.531989s, 27060 KB] Total time: 0.531989s
+PlanOpt implementation
+[t=1.878955s, 27304 KB] Expanded until last jump: 138527 state(s).
+[t=1.878955s, 27304 KB] Search time: 0.506979s
+[t=1.878955s, 27304 KB] Total time: 1.878955s
+
+Instance 10 with k=100000
+Extracted PATTERN: [50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65]
+Built-in implementation
+[t=0.037972s, 11912 KB] Expanded until last jump: 744 state(s).
+[t=0.037972s, 11912 KB] Search time: 0.002999s
+[t=0.037972s, 11912 KB] Total time: 0.037972s
+PlanOpt implementation
+[t=1.471966s, 12464 KB] Expanded until last jump: 744 state(s).
+[t=1.471966s, 12464 KB] Search time: 0.001999s
+[t=1.471966s, 12464 KB] Total time: 1.471966s
+
+Instance 11 with k=100000
+Extracted PATTERN: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=1.005784s, 42528 KB] Expanded until last jump: 314669 state(s).
+[t=1.005784s, 42528 KB] Search time: 0.975784s
+[t=1.005784s, 42528 KB] Total time: 1.005784s
+PlanOpt implementation
+[t=2.534438s, 42680 KB] Expanded until last jump: 314669 state(s).
+[t=2.534438s, 42680 KB] Search time: 1.108633s
+[t=2.534438s, 42680 KB] Total time: 2.534438s
+
+Instance 13 with k=100000
+Extracted PATTERN: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=0.045000s, 12136 KB] Expanded until last jump: 6742 state(s).
+[t=0.045000s, 12136 KB] Search time: 0.015000s
+[t=0.045000s, 12136 KB] Total time: 0.045000s
+PlanOpt implementation
+[t=1.501437s, 12448 KB] Expanded until last jump: 6742 state(s).
+[t=1.501437s, 12448 KB] Search time: 0.015996s
+[t=1.501437s, 12448 KB] Total time: 1.501437s
+
+Instance 14 with k=100000
+Extracted PATTERN: [50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65]
+Built-in implementation
+[t=0.084995s, 12940 KB] Expanded until last jump: 20966 state(s).
+[t=0.084995s, 12940 KB] Search time: 0.054002s
+[t=0.084995s, 12940 KB] Total time: 0.084995s
+PlanOpt implementation
+[t=1.347962s, 13200 KB] Expanded until last jump: 20966 state(s).
+[t=1.347962s, 13200 KB] Search time: 0.052999s
+[t=1.347962s, 13200 KB] Total time: 1.347962s
+
+Instance 16 with k=100000
+Extracted PATTERN: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=2.444912s, 76376 KB] Expanded until last jump: 698947 state(s).
+[t=2.444912s, 76376 KB] Search time: 2.413912s
+[t=2.444912s, 76376 KB] Total time: 2.444912s
+PlanOpt implementation
+[t=4.018901s, 76544 KB] Expanded until last jump: 698947 state(s).
+[t=4.018901s, 76544 KB] Search time: 2.625906s
+[t=4.018901s, 76544 KB] Total time: 4.018901s
+
+Instance 17 with k=100000
+Extracted PATTERN: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=3.678933s, 95152 KB] Expanded until last jump: 1045506 state(s).
+[t=3.678933s, 95152 KB] Search time: 3.649933s
+[t=3.678933s, 95152 KB] Total time: 3.678933s
+PlanOpt implementation
+[t=5.332829s, 95252 KB] Expanded until last jump: 1045506 state(s).
+[t=5.332829s, 95252 KB] Search time: 3.921863s
+[t=5.332829s, 95252 KB] Total time: 5.332829s
+
+Instance 18 with k=100000
+Extracted PATTERN: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+Built-in implementation
+[t=0.078998s, 12944 KB] Expanded until last jump: 22996 state(s).
+[t=0.078998s, 12944 KB] Search time: 0.048998s
+[t=0.078998s, 12944 KB] Total time: 0.078998s
+PlanOpt implementation
+[t=1.348961s, 13216 KB] Expanded until last jump: 22996 state(s).
+[t=1.348961s, 13216 KB] Search time: 0.047998s
+[t=1.348961s, 13216 KB] Total time: 1.348961s
+
+Instance 20 with k=100000
+Extracted PATTERN: [50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65]
+Built-in implementation
+[t=0.036988s, 11896 KB] Expanded until last jump: 106 state(s).
+[t=0.036988s, 11896 KB] Search time: 0.000000s
+[t=0.036988s, 11896 KB] Total time: 0.036988s
+PlanOpt implementation
+[t=1.360928s, 12444 KB] Expanded until last jump: 106 state(s).
+[t=1.360928s, 12444 KB] Search time: 0.000000s
+[t=1.360928s, 12444 KB] Total time: 1.360928s

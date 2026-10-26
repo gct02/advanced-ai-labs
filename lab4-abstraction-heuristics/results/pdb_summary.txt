@@ -1,0 +1,12 @@
+Implementation: Built-in
+  expanded: Mean = 1047216.1875, Std = 1510828.5433560214
+  search_time: Mean = 3.61898496875, Std = 5.418583852941523
+  total_time: Mean = 3.6399152187499997, Std = 5.415338760155446
+  Successful runs: 32
+
+Implementation: PlanOpt
+  expanded: Mean = 1047216.1875, Std = 1510828.5433560214
+  search_time: Mean = 3.6806156874999996, Std = 5.3595309795325505
+  total_time: Mean = 4.377514468749999, Std = 5.140078721810554
+  Successful runs: 32
+
